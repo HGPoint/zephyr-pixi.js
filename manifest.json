@@ -1,0 +1,15 @@
+{
+  "name": "Zephyr PIXI.JS v 0.1",
+  "id": "1298314155351311974",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "editorType": [
+    "figma"
+  ],
+  "ui": "dist/ui.html",
+  "networkAccess": {
+    "allowedDomains":["https://alpha.myranchgame.com", "https://dev.myranchgame.com"],
+    "reasoning": "Domains are missing from the whitelist",
+    "devAllowedDomains": ["*"]
+  }
+}

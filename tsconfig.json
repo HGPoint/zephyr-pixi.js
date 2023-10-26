@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "jsx": "react",
+    "lib": [
+      "es6",
+      "dom"
+    ],
+    "strict": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@figma",
+      "./node_modules/@types/pixi.js"
+    ]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
