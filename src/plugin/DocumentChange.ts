@@ -6,11 +6,11 @@ let selectionchangeTimer = 0;
 
 function documentchange(){
     
-    selectionchangeTimer && clearTimeout(selectionchangeTimer)
-    selectionchangeTimer = setTimeout(async () => {
-        await updateDocument();
-        figma.ui.postMessage({type: "documentchange", data: BaseDocument.current }, { origin: "*" });
-    }, 100);
+    //selectionchangeTimer && clearTimeout(selectionchangeTimer)
+    // selectionchangeTimer = setTimeout(async () => {
+    //     await updateDocument();
+    //     figma.ui.postMessage({type: "documentchange", data: BaseDocument.current }, { origin: "*" });
+    // }, 100);
     
 }
 

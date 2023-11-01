@@ -3,6 +3,7 @@ import { BaseContainer } from "../Nodes/BaseNodeContainer";
 import { delay } from "../Utils/utils";
 import { ComponentLibraries } from "../Nodes/ComponentLibraries";
 import { IBaseDocument } from "../../common/IBaseDocument";
+import { Logger } from "../../common/Logger";
 
 export class BaseDocument implements IBaseDocument {
 
@@ -54,17 +55,21 @@ export class BaseDocument implements IBaseDocument {
     }
 
     public async load(){
+        Logger.log("LOADING....IMAGES");
         do {
             await delay(50);
         } while (this._images.find(img => !img.isLoaded));
 
+        Logger.log("LOADING....COMPONENTS");
         do {
             await delay(50);
         } while (this.components.components.find(component => !component.isLoaded));
 
+        Logger.log("LOADING....COMPONENT SETS");
         do {
             await delay(50);
         } while (this.components.componentSets.find(component => !component.isLoaded));
+        Logger.log("LOADING....DONE")
     }
     
     // public clearResources(){

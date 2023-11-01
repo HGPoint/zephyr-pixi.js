@@ -38,14 +38,14 @@ function App() {
 
   const onGo = () => {
     const iframe = document.getElementById("gameFrame") as HTMLIFrameElement;
-    iframe.src = inputUrlRef.current?.value || "http://localhost:8080/?uid=80783";
+    iframe.src = inputUrlRef.current?.value || "";
 
     parent.postMessage({ pluginMessage: { type: "clientStorageData", data: { url: iframe.src } } }, "*");
   };
 
   const onEdit = () => {
     const iframe = document.getElementById("gameFrame") as HTMLIFrameElement;
-    iframe.src = inputUrlRef.current?.value || "http://localhost:8080/?uid=80783";
+    iframe.src = inputUrlRef.current?.value || "";
 
     parent.postMessage({ pluginMessage: { type: "clientStorageData", data: { url: iframe.src } } }, "*");
   };
@@ -136,12 +136,12 @@ function App() {
               // await atlas.addImages();
               // const result = await atlas.getOutput();
 
-              ul.innerHTML += 
-              data._images
-              .map((m:any) => {
-                return `<li>${m.hash}<img src='${m._bytes}' style='max-height:100px'/></li>`;
-              })
-              .join("");
+              // ul.innerHTML += 
+              // data._images
+              // .map((m:any) => {
+              //   return `<li>${m.hash}<img src='${m._bytes}' style='max-height:100px'/></li>`;
+              // })
+              // .join("");
 
               // if(result && result.bitmaps[0])
               // ul.innerHTML += `<li>ATLAS<img src='${result.bitmaps[0].image}' style='max-height:640px;max-width:640px;width:auto'/></li>`;
@@ -158,16 +158,16 @@ function App() {
               // await atlas.addImages();
               // const result = await atlas.getOutput();
               // console.log("_components", result);
-              ul.innerHTML += 
-              components
-              .map((m:any) => {
-                if(m.content){
-                  return `<li>${m.name}<img src='${m.content._bytes}' style='max-height:100px'/></li>`;
-                } else {
-                  return `<li>${m.name}</li>`;
-                }
-              })
-              .join("");
+              // ul.innerHTML += 
+              // components
+              // .map((m:any) => {
+              //   if(m.content){
+              //     return `<li>${m.name}<img src='${m.content._bytes}' style='max-height:100px'/></li>`;
+              //   } else {
+              //     return `<li>${m.name}</li>`;
+              //   }
+              // })
+              // .join("");
 
               // if(result && result.bitmaps[0])
               // ul.innerHTML += `<li>ATLAS<img src='${result.bitmaps[0].image}' style='max-height:640px;max-width:640px;width:auto'/></li>`;
@@ -192,15 +192,15 @@ function App() {
               // const result = await atlas.getOutput();
 
               //console.log("_componentSets", result);
-              ul.innerHTML += 
-              data.components._componentSets
-              .map((m:any) => {
-                var content = `<li>${m.name}<ul>`
-                content += m.variatns.map((v:any) => `<li>${v.name}<img src='${v._bytes}' style='max-height:100px'/></li>`).join("");
-                content += `</ul></li>`;
-                return content;
-              })
-              .join("");
+              // ul.innerHTML += 
+              // data.components._componentSets
+              // .map((m:any) => {
+              //   var content = `<li>${m.name}<ul>`
+              //   content += m.variatns.map((v:any) => `<li>${v.name}<img src='${v._bytes}' style='max-height:100px'/></li>`).join("");
+              //   content += `</ul></li>`;
+              //   return content;
+              // })
+              // .join("");
 
               // if(result && result.bitmaps[0])
               // ul.innerHTML += `<li>ATLAS<img src='${result.bitmaps[0].image}' style='max-height:640px;max-width:640px;width:auto'/></li>`;

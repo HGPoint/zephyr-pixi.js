@@ -67,7 +67,7 @@ export class FigmaComponentContent {
 
     async render(node: SceneNode){
         const hiddenTextNodes = this._hideText(node);
-        console.log("hiddenTextNodes", hiddenTextNodes);
+        
         const bytes = await node.exportAsync({
             format: 'PNG',
             constraint: { type: 'SCALE', value: 1 },
@@ -129,7 +129,7 @@ export class FigmaComponentSetNode {
     public variatns: FigmaComponentContent[] = [];
 
     public get isLoaded(){
-        return !this.variatns.some(v => !v.isLoaded);
+        return !this.variatns.find(v => !v.isLoaded);
     }
 
     constructor(componentSetNode: ComponentSetNode) {

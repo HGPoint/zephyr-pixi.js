@@ -53,9 +53,9 @@ export async function updateDocument() {
           if(!child.name.startsWith("$")){
             return;
           }
-          if(child.name != "$window_no_money"){
-            return;
-          }
+        //   if(child.name != "$areas_wnd_big"){
+        //     return;
+        //   }
           const container = new BaseContainer(child);
       
           build(child, container);
