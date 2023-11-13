@@ -9,26 +9,37 @@ import { clientStorageData, loadClientStorageData, saveClientStorageData } from 
 import { updateDocument } from "./UpdateDocument";
 import { Logger } from "../common/Logger";
 import { initDocumentChange } from "./DocumentChange";
+import { delay } from "./Utils/utils";
 
 async function main() {
-
-    //Logger.log("figma.currentPage", figma.currentPage);
-    //Logger.log("figma.currentPage", figma.root);
 
     await loadClientStorageData();
 
     figma.showUI(__html__, { width: clientStorageData.width, height: clientStorageData.height });
-
-    await updateDocument();
 
     figma.ui.postMessage({type: "clientStorageData", data: clientStorageData }, { origin: "*" });
 
     figma.ui.onmessage = async (message:{type:string;data:any}) => {
         switch(message.type){
           case "apply":
-            await updateDocument();
-            figma.ui.postMessage({type: "currentPage", data: BaseDocument.current }, { origin: "*" });
-            break;
+            {
+              const data:{target:string|undefined} = message.data;
+              if(data.target){
+                await updateDocument(false, data.target);
+                figma.ui.postMessage({type: "targetView", data: {
+                    document: BaseDocument.current,
+                    target: data.target
+                  } 
+                }, { origin: "*" });
+              } else {
+                await updateDocument(true);
+                figma.ui.postMessage({type: "currentPage", data: {
+                    document: BaseDocument.current
+                  } 
+                }, { origin: "*" });
+              }
+              break;
+            }
           case "clientStorageData":
             clientStorageData.url = message.data.url || clientStorageData.url;
             saveClientStorageData();
@@ -53,6 +64,17 @@ async function main() {
     };
 
     initDocumentChange();
+
+    figma.ui.postMessage({type: "setLoading", data: true }, { origin: "*" });
+    await delay(100);
+    await updateDocument(false);
+
+    figma.ui.postMessage({type: "currentPage", data: {
+      document: BaseDocument.current
+    } }, { origin: "*" });
+
+    
+    Logger.log("STARTED");
 }
   
 main();

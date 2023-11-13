@@ -14,26 +14,31 @@ export interface IDefaultNode {
 export interface IBaseFrameNodeProp extends IDefaultNode {
     opacity: number;
     rotation: number;
-    layoutMode: 'NONE' | 'HORIZONTAL' | 'VERTICAL'
-    primaryAxisSizingMode: 'FIXED' | 'AUTO'
-    counterAxisSizingMode: 'FIXED' | 'AUTO'
-    primaryAxisAlignItems: 'MIN' | 'MAX' | 'CENTER' | 'SPACE_BETWEEN'
-    counterAxisAlignItems: 'MIN' | 'MAX' | 'CENTER' | 'BASELINE'
-    paddingLeft: number
-    paddingRight: number
-    paddingTop: number
-    paddingBottom: number
-    itemSpacing: number
-    itemReverseZIndex: boolean
-    strokesIncludedInLayout: boolean
+    layoutMode: 'NONE' | 'HORIZONTAL' | 'VERTICAL';
+    layoutAlign: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'INHERIT';
+    layoutGrow: number;
+    layoutPositioning: 'AUTO' | 'ABSOLUTE';
+    //layoutWrap:
+    primaryAxisSizingMode: 'FIXED' | 'AUTO';
+    counterAxisSizingMode: 'FIXED' | 'AUTO';
+    primaryAxisAlignItems: 'MIN' | 'MAX' | 'CENTER' | 'SPACE_BETWEEN';
+    counterAxisAlignItems: 'MIN' | 'MAX' | 'CENTER' | 'BASELINE';
+    paddingLeft: number;
+    paddingRight: number;
+    paddingTop: number;
+    paddingBottom: number;
+    itemSpacing: number;
+    itemReverseZIndex: boolean;
+    strokesIncludedInLayout: boolean;
     //horizontalPadding: number //is no longer supported
     //verticalPadding: number //is no longer supported
     //layoutGrids: ReadonlyArray<LayoutGrid>
-    gridStyleId: string
-    clipsContent: boolean
+    gridStyleId: string;
+    clipsContent: boolean;
 }
 
 export interface IInstanceNodeProp extends IDefaultNode {
+    opacity: number;
     mainComponent: string | null;
     overrides: {
         id: string
@@ -46,7 +51,7 @@ export interface IInstanceNodeProp extends IDefaultNode {
 
 
 export interface IRectangleNodeProp extends IDefaultNode {
-
+    isMask: boolean;
 }
 
 export interface ITextNodeProp extends IDefaultNode {
@@ -98,6 +103,7 @@ export class BaseContainer implements IBaseNode {
     public properties: IRectangleNodeProp | ITextNodeProp | IBaseFrameNodeProp | IInstanceNodeProp | null = null;
 
     constructor(node: SceneNode) {
+        //@ts-ignore
         this.type = node.type;
         this.id = node.id;
         this.name = node.name;
@@ -112,6 +118,9 @@ export class BaseContainer implements IBaseNode {
                 opacity: node.opacity,
                 rotation: node.rotation,
                 layoutMode: node.layoutMode,
+                layoutAlign: node.layoutAlign,
+                layoutGrow: node.layoutGrow,
+                layoutPositioning: node.layoutPositioning,
                 primaryAxisSizingMode: node.primaryAxisSizingMode,
                 counterAxisSizingMode: node.counterAxisSizingMode, 
                 primaryAxisAlignItems: node.primaryAxisAlignItems,
@@ -128,6 +137,7 @@ export class BaseContainer implements IBaseNode {
             } as IBaseFrameNodeProp;
         } else if(node.type == "INSTANCE"){
             this.properties =  {
+                opacity: node.opacity,
                 mainComponent: node.mainComponent?.id,
                 overrides: node.overrides.map(ov => {
                     return {
@@ -143,7 +153,12 @@ export class BaseContainer implements IBaseNode {
                 })
             } as IInstanceNodeProp;
 
-            node.mainComponent && ComponentLibraries.addComponent(node, (this.properties as IInstanceNodeProp).overrides);
+            if(node.mainComponent?.parent && node.mainComponent.parent.name == "Fonts"){
+                this.type = "FRAME";
+                this.properties.mainComponent = null;
+            } else {
+                node.mainComponent && ComponentLibraries.addComponent(node, (this.properties as IInstanceNodeProp).overrides);
+            }
 
         } else if(node.type == "TEXT"){
             this.properties = {
@@ -187,7 +202,7 @@ export class BaseContainer implements IBaseNode {
             } as ITextNodeProp
         } else if(node.type == "RECTANGLE"){
             this.properties = {
-
+                isMask: node.isMask
             } as IRectangleNodeProp;
         }
 

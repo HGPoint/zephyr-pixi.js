@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
+   fill="none"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="img.svg"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="18.141708"
+     inkscape:cx="15.186001"
+     inkscape:cy="14.80015"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <rect
+     style="fill:#aad400;fill-opacity:1;stroke:none;stroke-width:1.088;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
+     id="rect1"
+     width="15.571852"
+     height="11.988948"
+     x="0.2204864"
+     y="2.0946207"
+     rx="1.3504792"
+     ry="1.3504792" />
+  <path
+     d="M 0.43267781,10.965004 4.4363191,6.9613637 a 1.7461122,1.7461122 0 0 1 2.4693908,0 L 10.909352,10.965004 M 9.7452767,9.8009303 10.838731,8.7074757 a 1.7461122,1.7461122 0 0 1 2.469391,0 L 15.56565,10.965004 M 1.5967526,13.875191 H 14.401576 A 1.1640749,1.1640749 0 0 0 15.56565,12.711117 V 3.3985187 A 1.1640749,1.1640749 0 0 0 14.401576,2.2344438 H 1.5967526 A 1.1640749,1.1640749 0 0 0 0.43267781,3.3985187 v 9.3125983 a 1.1640749,1.1640749 0 0 0 1.16407479,1.164074 z m 8.1485241,-8.73056 h 0.00622 v 0.00621 h -0.00622 z m 0.2910183,0 a 0.29101871,0.29101871 0 1 1 -0.5820372,0 0.29101871,0.29101871 0 0 1 0.5820372,0 z"
+     stroke="#000000"
+     stroke-width="1.08791"
+     id="path1"
+     sodipodi:nodetypes="cccc"
+     style="fill:none;stroke-width:0.844343;stroke-linecap:round;stroke-dasharray:none" />
+</svg>

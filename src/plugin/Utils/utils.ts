@@ -27,3 +27,10 @@ async function imgGenerate(node:SceneNode){
         }];
     }
 }
+
+var nowOffset = Date.now();
+export function performanceNow(){
+
+    return (Date.now() - nowOffset) / 1000;
+  
+}

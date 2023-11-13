@@ -109,12 +109,16 @@ export class DocumentSpritesheets {
 
         const nodeResourcesIds:Array<{
             key:string;
+            id:string;
+            name:string;
             data:string[];
         }> = [];
 
         data._children.forEach((node:IBaseNode) => {
             nodeResourcesIds.push({
                 key: node.id.split(":").join("_"),
+                id: node.id,
+                name: node.name,
                 data: this.getResourcesIds(data, node)
             });
         });
@@ -152,7 +156,12 @@ export class DocumentSpritesheets {
         atlases.push(await this.buildAtlas(data, matchResourcesIds, "common"));
 
         for (let i = 0; i < nodeResourcesIds.length; i++) {
-            atlases.push(await this.buildAtlas(data, nodeResourcesIds[i].data, nodeResourcesIds[i].key));
+            const atlas = await this.buildAtlas(data, nodeResourcesIds[i].data, nodeResourcesIds[i].key);
+            if(atlas){
+                //@ts-ignore
+                atlas["node_id"] = nodeResourcesIds[i].id;
+            }
+            atlases.push(atlas);
         }
 
         return atlases;

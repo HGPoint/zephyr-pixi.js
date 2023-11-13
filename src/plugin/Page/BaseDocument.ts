@@ -1,9 +1,17 @@
 import { ImageRes } from "./ImageRes";
 import { BaseContainer } from "../Nodes/BaseNodeContainer";
 import { delay } from "../Utils/utils";
-import { ComponentLibraries } from "../Nodes/ComponentLibraries";
+import { ComponentLibraries, componentContentLoadQueue } from "../Nodes/ComponentLibraries";
 import { IBaseDocument } from "../../common/IBaseDocument";
 import { Logger } from "../../common/Logger";
+
+export function loadProgress(value:number, desc:string){
+    Logger.log("loadProgress", value, desc);
+    figma.ui.postMessage({type: "loadProgress", data: {
+        value:value,
+        desc: desc
+    }  }, { origin: "*" });
+}
 
 export class BaseDocument implements IBaseDocument {
 
@@ -55,21 +63,29 @@ export class BaseDocument implements IBaseDocument {
     }
 
     public async load(){
-        Logger.log("LOADING....IMAGES");
-        do {
-            await delay(50);
-        } while (this._images.find(img => !img.isLoaded));
 
-        Logger.log("LOADING....COMPONENTS");
-        do {
-            await delay(50);
-        } while (this.components.components.find(component => !component.isLoaded));
+        let componentContentLoad = componentContentLoadQueue.peek();
+        let start = componentContentLoadQueue.length;
+        
+        while(componentContentLoad){
+            let progress = (1-componentContentLoadQueue.length/start);
+            try{
 
-        Logger.log("LOADING....COMPONENT SETS");
-        do {
-            await delay(50);
-        } while (this.components.componentSets.find(component => !component.isLoaded));
-        Logger.log("LOADING....DONE")
+                loadProgress(progress, `LOADING....COMPONENTS ${componentContentLoad.componentContent.name}`);
+
+                //Logger.log("LOADING....COMPONENTS", componentContentLoad.componentContent.name);
+
+                await componentContentLoad.componentContent.render(componentContentLoad.node);
+            } catch (error) {
+                Logger.log("LOADING....COMPONENTS - ERROR", error);
+
+                loadProgress(progress, `LOADING....COMPONENTS - ERROR! ${componentContentLoad.componentContent.name}`);
+            }
+            componentContentLoadQueue.dequeue();
+            componentContentLoad = componentContentLoadQueue.peek();
+        }
+        loadProgress(1, `LOADING....DONE`);
+        //Logger.log("LOADING....DONE")
     }
     
     // public clearResources(){

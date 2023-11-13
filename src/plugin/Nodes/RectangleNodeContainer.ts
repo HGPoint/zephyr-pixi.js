@@ -1,4 +1,4 @@
-import { BaseContainer } from "./BaseNodeContainer";
+import { BaseContainer, IRectangleNodeProp } from "./BaseNodeContainer";
 import { ImagePaintContainer } from "../Paint/ImagePaintContainer";
 import { SolidPaintContainer } from "../Paint/SolidPaintContainer";
 import { Logger } from "../../common/Logger";
@@ -41,9 +41,32 @@ export class RectangleNodeContainer extends BaseContainer {
             }
         });
 
+        // if((this.properties as IRectangleNodeProp).isMask && node.name == "@mask"){
+        //     this._buildMask(node);
+        // }
+
         this._fillGeometry = node.fillGeometry.map(g => new VectorPath(g.data, g.windingRule));
 
     }
+
+    // private _bytes: string = "";
+    // private _size: {
+    //     width: number;
+    //     height: number;
+    // } = {
+    //         width: 0,
+    //         height: 0
+    //     };
+    // private async _buildMask(node: RectangleNode){
+    //     const bytes = await node.exportAsync({
+    //         format: 'PNG',
+    //         constraint: { type: 'SCALE', value: 1 },
+    //     });
+    //     const image = figma.createImage(bytes);
+    //     this._bytes = "data:image/png;base64," + figma.base64Encode(bytes);
+    //     this._size = await image.getSizeAsync();
+    //     console.log("_buildMask", this);
+    // }
 }
 
 

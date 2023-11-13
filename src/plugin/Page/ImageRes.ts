@@ -16,7 +16,7 @@ export class ImageRes {
 
     constructor(public hash: string) {
         this.id = hash;
-        this._init();
+        //this._init();
     }
 
     private async _init() {
