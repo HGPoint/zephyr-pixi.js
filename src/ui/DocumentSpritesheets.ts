@@ -11,10 +11,10 @@ export class DocumentSpritesheets {
             const instanceNode = baseNode as IBaseInstanceNode;
             
             if(instanceNode.properties.mainComponent) {
-              const componentSets: {id:string;variatns:any[]}[] =  data.components._componentSets;
+              const componentSets: {id:string;variants:any[]}[] =  data.components._componentSets;
               
               componentSets.forEach((component) => {
-                component.variatns.filter(v => v.id == instanceNode.properties.mainComponent).length &&
+                component.variants.filter(v => v.id == instanceNode.properties.mainComponent).length &&
                 ids.push(component.id);
               })
               //ids.push(node.id);
@@ -64,12 +64,12 @@ export class DocumentSpritesheets {
         }[] = [];
 
         componentSets.forEach((component) => {
-            (sprites.includes(component.id) || component.variatns.filter((v:any) => sprites.includes(v.id)).length) &&
-            component.variatns.forEach((variatn:any) => {
+            (sprites.includes(component.id) || component.variants.filter((v:any) => sprites.includes(v.id)).length) &&
+            component.variants.forEach((variant:any) => {
                 images.push({
-                src: variatn._bytes,
-                id: variatn.id,
-                name: variatn.id.replace(":","_")
+                src: variant._bytes,
+                id: variant.id,
+                name: variant.id.replace(":","_")
                 });
             })
         })

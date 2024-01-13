@@ -42,7 +42,7 @@ export async function exportDocument() {
     const componentSets = BaseDocument.current.components.componentSets;
     for (let i = 0; i < componentSets.length; i++) {
         const componentSet = componentSets[i];
-        componentSet.variatns.forEach(variant => {
+        componentSet.variants.forEach(variant => {
             const node = figma.getNodeById(variant.id) as SceneNode;
             node && nodes.push(node);
         })

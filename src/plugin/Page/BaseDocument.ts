@@ -95,7 +95,7 @@ export class BaseDocument implements IBaseDocument {
     //     }); 
 
     //     this.components.componentSets.forEach(component => {
-    //         component.variatns.forEach(variatn => variatn.clear());
+    //         component.variants.forEach(variant => variant.clear());
     //     });
 
     //     this.images.forEach(image => {

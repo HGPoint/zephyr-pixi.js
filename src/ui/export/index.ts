@@ -72,7 +72,7 @@ export async function exportData (data:any, figmaDocument:IBaseDocument) {
     }); 
 
     figmaDocument.components._componentSets.forEach(component => {
-      component.variatns.forEach((variatn:any) => variatn._bytes = "");
+      component.variants.forEach((variant:any) => variant._bytes = "");
     });
 
     figmaDocument._images.forEach(image => {

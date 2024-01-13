@@ -65,9 +65,9 @@ export class AtlasNode {
     this.filled = false;
   }
 
-  pack(rect: Rect): AtlasNode | null | undefined {
+  pack(rect: Rect, margin: number): AtlasNode | null | undefined {
     if (this.left !== null) {
-      return this.left.pack(rect) || this.right?.pack(rect);
+      return this.left.pack(rect, margin) || this.right?.pack(rect, margin);
     }
 
     // if atlas filled or wont fit
@@ -83,18 +83,19 @@ export class AtlasNode {
 
     if ((this.rect.w - rect.w) > (this.rect.h - rect.h)) {
       this.left = new AtlasNode(this.rect.x, this.rect.y, rect.w, this.rect.h);
-      this.right = new AtlasNode(this.rect.x + rect.w, this.rect.y, this.rect.w - rect.w, this.rect.h);
+      this.right = new AtlasNode(this.rect.x + rect.w + margin, this.rect.y, this.rect.w - rect.w, this.rect.h);
     } else {
       this.left = new AtlasNode(this.rect.x, this.rect.y, this.rect.w, rect.h);
-      this.right = new AtlasNode(this.rect.x, this.rect.y + rect.h, this.rect.w, this.rect.h - rect.h);
+      this.right = new AtlasNode(this.rect.x, this.rect.y + rect.h + margin, this.rect.w, this.rect.h - rect.h);
     }
 
-    return this.left.pack(rect);
+    return this.left.pack(rect, margin);
   }
 }
 
 export interface AtlasOptions {
   tilepad?: boolean;
+  margin?: number;
 }
 
 export interface RectIndex {
@@ -111,6 +112,7 @@ export interface UvIndex2 {
 
 class Atlas {
   tilepad: boolean;
+  margin: number;
 
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
@@ -126,6 +128,7 @@ class Atlas {
 
   constructor(canvas: HTMLCanvasElement, options: AtlasOptions = {}) {
     this.tilepad = options.tilepad || false;
+    this.margin = options.margin || 0;
 
     this.canvas = canvas;
 
@@ -195,9 +198,9 @@ class Atlas {
   }
 
   private _pack(id: string, img: Drawable) {
-    const rect = new Rect(0, 0, img.width, img.height);
+    const rect = new Rect(0, 0, img.width, img.height)
 
-    const node = this._rootNode.pack(rect);
+    const node = this._rootNode.pack(rect, this.margin);
     if (!node) return null;
 
     this._ontoCanvas(id, img, node.rect);
@@ -216,11 +219,11 @@ class Atlas {
     let right: AtlasNode;
 
     if (this._rootNode.rect.w < this._rootNode.rect.h) {
-      this.canvas.width = this._rootNode.rect.w + rect.w;
-      right = new AtlasNode(this._rootNode.rect.w, 0, rect.w, this._rootNode.rect.h);
+      this.canvas.width = this._rootNode.rect.w + rect.w + this.margin;
+      right = new AtlasNode(this._rootNode.rect.w + this.margin, 0, rect.w, this._rootNode.rect.h);
     } else {
-      this.canvas.height = this._rootNode.rect.h + rect.h;
-      right = new AtlasNode(0, this._rootNode.rect.h, this._rootNode.rect.w, rect.h);
+      this.canvas.height = this._rootNode.rect.h + rect.h + this.margin;
+      right = new AtlasNode(0, this._rootNode.rect.h + this.margin, this._rootNode.rect.w, rect.h);
     }
 
     this.context.putImageData(backup, 0, 0);

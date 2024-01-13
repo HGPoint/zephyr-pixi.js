@@ -39,7 +39,7 @@ export class Spritesheet {
             var canvas = document.createElement('canvas');
             canvas.width  = size;
             canvas.height = size;
-            this._bitmapsAtlases[0] = new Atlas(canvas);
+            this._bitmapsAtlases[0] = new Atlas(canvas, {margin: margin});
         }
     }
 
