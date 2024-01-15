@@ -172,10 +172,10 @@ export class FigmaComponentSetNode {
         }
     } = {};
 
-    public variatns: FigmaComponentContent[] = [];
+    public variants: FigmaComponentContent[] = [];
 
     public get isLoaded(){
-        return !this.variatns.find(v => !v.isLoaded);
+        return !this.variants.find(v => !v.isLoaded);
     }
 
     constructor(componentSetNode: ComponentSetNode) {
@@ -196,10 +196,10 @@ export class FigmaComponentSetNode {
         for (let i = 0; i < componentSetNode.children.length; i++) {
             const node = componentSetNode.children[i];
             
-            this.variatns.push(new FigmaComponentContent(node))
+            this.variants.push(new FigmaComponentContent(node))
         }
 
-        //this.defaultVariant = this.variatns[0]?.id;
+        //this.defaultVariant = this.variants[0]?.id;
     }
 
 }
