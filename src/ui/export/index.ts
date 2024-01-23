@@ -78,6 +78,7 @@ export async function exportData (data:any, figmaDocument:IBaseDocument) {
     figmaDocument._images.forEach(image => {
       image._bytes = "";
     });
+    figmaDocument.atlases = atlases.filter(a => !!a).map(a => a?.name ? a.name:'');
     zip.file(`figma.json`, JSON.stringify(figmaDocument));
 
     zip.generateAsync({ type: 'blob' })
@@ -88,7 +89,7 @@ export async function exportData (data:any, figmaDocument:IBaseDocument) {
         link.href = blobURL;
         link.download = fileName + ".zip"
         link.click()
-        link.setAttribute('download', name + '.zip');
+        link.setAttribute('download', fileName + '.zip');
         resolve();
       });
   })

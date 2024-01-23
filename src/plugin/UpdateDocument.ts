@@ -63,9 +63,9 @@ export async function updateDocument(load:boolean = true, target = "") {
                 return;
             }
 
-            //   if(child.name != "$areas_wnd_big"){
+            // if(child.name != "$booster_unlocked_window" && child.name != "$BOOSTER_BUY"){
             //     return;
-            //   }
+            // }
             let t0 = performanceNow();
             const container = new BaseContainer(child);
       

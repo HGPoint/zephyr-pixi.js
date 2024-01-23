@@ -13,12 +13,17 @@ export class DocumentSpritesheets {
             if(instanceNode.properties.mainComponent) {
               const componentSets: {id:string;variants:any[]}[] =  data.components._componentSets;
               
+              const setIds:string[] = [];
               componentSets.forEach((component) => {
                 component.variants.filter(v => v.id == instanceNode.properties.mainComponent).length &&
-                ids.push(component.id);
+                setIds.push(component.id);
               })
-              //ids.push(node.id);
-              ids.push(instanceNode.properties.mainComponent);
+
+              if(setIds.length > 0){
+                ids.push(...setIds);
+              }else{
+                ids.push(instanceNode.properties.mainComponent);
+              }
             }else{
               ids.push(instanceNode.id);
             }

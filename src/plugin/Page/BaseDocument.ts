@@ -17,6 +17,8 @@ export class BaseDocument implements IBaseDocument {
 
     private static _currentPage: BaseDocument;
 
+    atlases: string[] = [];
+
     public static set current(value: BaseDocument){
         this._currentPage = value;
     }

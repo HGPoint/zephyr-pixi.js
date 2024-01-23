@@ -9,4 +9,5 @@ export interface IBaseDocument {
     components: IComponentLibraries;
     _children: Array<IBaseNode>;
     _images:Array<any>;
+    atlases: string[];
 }
