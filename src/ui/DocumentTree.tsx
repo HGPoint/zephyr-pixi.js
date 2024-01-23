@@ -17,7 +17,8 @@ let _figmaData:IBaseDocument = {
     _componentSets:[]
   },
   _children:[],
-  _images:[]
+  _images:[],
+  atlases:[]
 };
 
 let openImgDialog: (node:any) => void;

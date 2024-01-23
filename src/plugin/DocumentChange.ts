@@ -62,7 +62,7 @@ export function initDocumentChange(){
 
         if (selection.type == 'INSTANCE'){
             Logger.log("mainComponent", selection.mainComponent);
-            Logger.log("mainComponent", selection.mainComponent?.parent);
+            Logger.log("mainComponent?.parent", selection.mainComponent?.parent);
         }
         //await imgGenerate(selection);
 
