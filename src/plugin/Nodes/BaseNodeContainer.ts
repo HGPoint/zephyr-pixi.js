@@ -9,6 +9,9 @@ export interface IDefaultNode {
     width: number
     height: number
     absoluteBoundingBox: Rect | null
+    layoutPositioning: 'AUTO' | 'ABSOLUTE'
+    layoutSizingHorizontal: 'FIXED' | 'HUG' | 'FILL'
+    layoutSizingVertical: 'FIXED' | 'HUG' | 'FILL'
 }
 
 export interface IBaseFrameNodeProp extends IDefaultNode {
@@ -17,7 +20,6 @@ export interface IBaseFrameNodeProp extends IDefaultNode {
     layoutMode: 'NONE' | 'HORIZONTAL' | 'VERTICAL';
     layoutAlign: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'INHERIT';
     layoutGrow: number;
-    layoutPositioning: 'AUTO' | 'ABSOLUTE';
     //layoutWrap:
     primaryAxisSizingMode: 'FIXED' | 'AUTO';
     counterAxisSizingMode: 'FIXED' | 'AUTO';
@@ -40,6 +42,10 @@ export interface IBaseFrameNodeProp extends IDefaultNode {
 export interface IInstanceNodeProp extends IDefaultNode {
     opacity: number;
     mainComponent: string | null;
+    constraints: {
+        horizontal: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE',
+        vertical: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE'
+    };
     overrides: {
         id: string
         overriddenFields: {
@@ -120,11 +126,13 @@ export class BaseContainer implements IBaseNode {
                 layoutMode: node.layoutMode,
                 layoutAlign: node.layoutAlign,
                 layoutGrow: node.layoutGrow,
-                layoutPositioning: node.layoutPositioning,
                 primaryAxisSizingMode: node.primaryAxisSizingMode,
                 counterAxisSizingMode: node.counterAxisSizingMode, 
                 primaryAxisAlignItems: node.primaryAxisAlignItems,
                 counterAxisAlignItems: node.counterAxisAlignItems,
+                layoutPositioning: node.layoutPositioning,
+                layoutSizingHorizontal: node.layoutSizingHorizontal,
+                layoutSizingVertical: node.layoutSizingVertical,
                 paddingLeft: node.paddingLeft,
                 paddingRight: node.paddingRight,
                 paddingTop: node.paddingTop,
@@ -133,12 +141,16 @@ export class BaseContainer implements IBaseNode {
                 itemReverseZIndex: node.itemReverseZIndex,
                 strokesIncludedInLayout: node.strokesIncludedInLayout,
                 gridStyleId: node.gridStyleId,
-                clipsContent: node.clipsContent,
+                clipsContent: node.clipsContent
             } as IBaseFrameNodeProp;
         } else if(node.type == "INSTANCE"){
             this.properties =  {
                 opacity: node.opacity,
                 mainComponent: node.mainComponent?.id,
+                layoutPositioning: node.layoutPositioning,
+                layoutSizingHorizontal: node.layoutSizingHorizontal,
+                layoutSizingVertical: node.layoutSizingVertical,
+                constraints: node.constraints,
                 overrides: node.overrides.map(ov => {
                     return {
                         id: ov.id,
@@ -198,11 +210,17 @@ export class BaseContainer implements IBaseNode {
                     value: node.hyperlink?.value
                 },
                 characters: node.characters,
-                strokeWeight: node.strokeWeight
+                strokeWeight: node.strokeWeight,
+                layoutPositioning: node.layoutPositioning,
+                layoutSizingHorizontal: node.layoutSizingHorizontal,
+                layoutSizingVertical: node.layoutSizingVertical,
             } as ITextNodeProp
         } else if(node.type == "RECTANGLE"){
             this.properties = {
-                isMask: node.isMask
+                isMask: node.isMask,
+                layoutPositioning: node.layoutPositioning,
+                layoutSizingHorizontal: node.layoutSizingHorizontal,
+                layoutSizingVertical: node.layoutSizingVertical,
             } as IRectangleNodeProp;
         }
 
