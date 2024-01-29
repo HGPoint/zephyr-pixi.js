@@ -83,10 +83,10 @@ export class AtlasNode {
 
     if ((this.rect.w - rect.w) > (this.rect.h - rect.h)) {
       this.left = new AtlasNode(this.rect.x, this.rect.y, rect.w, this.rect.h);
-      this.right = new AtlasNode(this.rect.x + rect.w + margin, this.rect.y, this.rect.w - rect.w, this.rect.h);
+      this.right = new AtlasNode(this.rect.x + rect.w + margin, this.rect.y, this.rect.w - rect.w - margin, this.rect.h);
     } else {
       this.left = new AtlasNode(this.rect.x, this.rect.y, this.rect.w, rect.h);
-      this.right = new AtlasNode(this.rect.x, this.rect.y + rect.h + margin, this.rect.w, this.rect.h - rect.h);
+      this.right = new AtlasNode(this.rect.x, this.rect.y + rect.h + margin, this.rect.w, this.rect.h - rect.h - margin);
     }
 
     return this.left.pack(rect, margin);
