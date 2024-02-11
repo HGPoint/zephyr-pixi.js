@@ -65,7 +65,9 @@ export class DocumentSpritesheets {
         let images:{
             src: string,
             name: string,
-            id: string
+            id: string,
+            width: number,
+            height: number,
         }[] = [];
 
         componentSets.forEach((component) => {
@@ -74,7 +76,9 @@ export class DocumentSpritesheets {
                 images.push({
                 src: variant._bytes,
                 id: variant.id,
-                name: variant.id.replace(":","_")
+                name: variant.id.replace(":","_"),
+                width: variant._size.width,
+                height: variant._size.height,
                 });
             })
         })
@@ -83,7 +87,9 @@ export class DocumentSpritesheets {
             images.push({
                 src: component.content._bytes,
                 id: component.id,
-                name: component.id.replace(":","_")
+                name: component.id.replace(":","_"),
+                width: component.content._size.width,
+                height: component.content._size.height,
             });
         });
 
@@ -92,13 +98,15 @@ export class DocumentSpritesheets {
         const atlasimages = images.map((image:any) => {
             return {
                 src: image.src,
-                name: image.name
+                name: image.name,
+                width: image.width,
+                height: image.height,
             }
         });
 
         //console.log("atlasimages:", atlasimages);
 
-        const atlas = new Spritesheet(48, atlasimages, 1, 1, key);
+        const atlas = new Spritesheet(48, atlasimages, 1, 1, key, {maxWidth: 2048, maxHeight: 2048, padding: 4});
         await atlas.addImages();
         const result = await atlas.getOutput();
         

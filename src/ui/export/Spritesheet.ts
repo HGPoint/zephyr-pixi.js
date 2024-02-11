@@ -3,6 +3,9 @@
 import Rect from './Rect';
 import Atlas, { Drawable } from './Atlas';
 import { resolve } from 'path';
+import {PackerAtlas} from "./packer/PackerAtlas";
+import {GrowingPacker, PackerNode} from "./packer/GrowingPacker";
+import {AtlasImage} from "./packer/PackerImage";
 
 function btoa(str:any) {
     var buffer;
@@ -16,16 +19,22 @@ function btoa(str:any) {
     return buffer.toString('base64');
 }
 
+export type SpritesSheetOptions = {
+    maxWidth: number;
+    maxHeight: number;
+    padding: number;
+}
+
 export class Spritesheet {
     private _margin: number = 0;
     private _size: number = 1024;
     private _outputName: string;
     private _scaleBitmap: number = 1;
     private _currentBitmapsAtlasIndex: number;
-    private _bitmaps: {src:string;name:string}[];
+    private _bitmaps: {src:string, name:string, width: number, height: number}[];
     private _bitmapsAtlases: Atlas[] = [];
 
-    constructor(size:number, bitmaps:{src:string;name:string}[], scaleBitmap:number, margin:number, outputName: string) {
+    constructor(size:number, bitmaps:{src:string, name:string, width: number, height: number}[], scaleBitmap:number, margin:number, outputName: string, options: SpritesSheetOptions) {
         this._margin = margin;
         this._size = size;
         this._outputName = outputName;
@@ -35,6 +44,8 @@ export class Spritesheet {
 
         this._bitmapsAtlases = [];
 
+        const calculatedAtlases = this.getGrowingPackerAtlases(options);
+
         if (this._bitmaps.length > 0) {
             var canvas = document.createElement('canvas');
             canvas.width  = size;
@@ -43,6 +54,34 @@ export class Spritesheet {
         }
     }
 
+    private getGrowingPackerAtlases(options: SpritesSheetOptions): PackerAtlas[] {
+        const result: PackerAtlas[] = [];
+
+        //let noFitImages = this._bitmaps.concat();
+        let noFitImages: PackerNode[] = this._bitmaps.map(item => {
+            return {
+                key: item.name,
+                src: item.src,
+                width: item.width,
+                height: item.height,
+            }
+        });
+
+        while (noFitImages.length > 0) {
+            const packer = new GrowingPacker(options.maxWidth, options.maxHeight);
+            packer.fit(noFitImages);
+            const atlas = new PackerAtlas(packer);
+            noFitImages.forEach((item) => {
+                if (item.fit) {
+                    const image = new AtlasImage(item, options.padding);
+                    atlas.addImage(image);
+                }
+            });
+            result.push(atlas);
+            noFitImages = packer.nofit;
+        }
+        return result;
+    }
     async build() {
         await this.addImages();
 

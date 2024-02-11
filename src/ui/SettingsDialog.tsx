@@ -76,12 +76,24 @@ export class SettingsDialog extends React.Component {
                             <span className="label-text">Window Width:</span>
                         </label>
                         <input type="number" min="640" value={this.state.width} onChange={(e) => this.setState({width: parseInt(e.target.value)})} className="input input-bordered input-sm w-full"/>
-                        
                         <label className="label">
                             <span className="label-text">Window Height:</span>
                         </label>
                         <input type="number" min="640" value={this.state.height} onChange={(e) => this.setState({height: parseInt(e.target.value)})}  className="input input-bordered input-sm w-full"/>
                         <button className="btn btn-sm m-1" onClick={onResize}>Resize Window</button>
+
+
+                        <label className="label">
+                            <span className="label-text">Common atlas max width:</span>
+                        </label>
+                        <input type="number" min="0" value={this.state.width} onChange={(e) => this.setState({width: parseInt(e.target.value)})} className="input input-bordered input-sm w-full"/>
+
+                        <label className="label">
+                            <span className="label-text">Common atlas max height:</span>
+                        </label>
+                        <input type="number" min="0" value={this.state.height} onChange={(e) => this.setState({height: parseInt(e.target.value)})}  className="input input-bordered input-sm w-full"/>
+                        <button className="btn btn-sm m-1" onClick={onResize}>Save atlas options</button>
+
                         <div className="modal-action">
                             <label htmlFor="my_modal_6" onClick={onClose} className="btn">OK</label>
                         </div>
