@@ -58,6 +58,7 @@ export interface IInstanceNodeProp extends IDefaultNode {
 
 export interface IRectangleNodeProp extends IDefaultNode {
     isMask: boolean;
+    cornerRadius: number;
 }
 
 export interface ITextNodeProp extends IDefaultNode {
@@ -218,6 +219,7 @@ export class BaseContainer implements IBaseNode {
         } else if(node.type == "RECTANGLE"){
             this.properties = {
                 isMask: node.isMask,
+                cornerRadius: typeof node.cornerRadius === 'number'  ? node.cornerRadius : 0,
                 layoutPositioning: node.layoutPositioning,
                 layoutSizingHorizontal: node.layoutSizingHorizontal,
                 layoutSizingVertical: node.layoutSizingVertical,
