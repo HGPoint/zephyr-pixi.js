@@ -1,4 +1,5 @@
 import { BaseDocument } from "./Page/BaseDocument";
+import {clientStorageData} from "./ClientStorageData";
 
 interface ExportSettingsJson {
     readonly format: 'JSON'
@@ -10,6 +11,12 @@ export interface IExportableResources {
     id: string;
     setting: ExportSettingsImage | ExportSettingsPDF | ExportSettingsSVG | ExportSettingsJson;
     bytes: Uint8Array | ArrayBuffer;
+}
+
+export type ExportOptions = {
+    atlasMaxWidth: number,
+    atlasMaxHeight: number,
+    margin: number;
 }
 
 // function encode_utf8(s:string) {
@@ -86,9 +93,14 @@ export async function exportDocument() {
     //     setting : { format: "JSON", suffix: "" },
     //     bytes: uint8array,
     // });
-    
+
     figma.ui.postMessage({type: "export", data: {
         resources: exportableResources,
-        document: BaseDocument.current
+        document: BaseDocument.current,
+        options: {
+            atlasMaxWidth: clientStorageData.atlasMaxWidth,
+            atlasMaxHeight: clientStorageData.atlasMaxHeight,
+            margin: clientStorageData.atlasMargin,
+        } as ExportOptions
     }});
 }

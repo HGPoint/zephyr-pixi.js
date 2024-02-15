@@ -55,6 +55,12 @@ async function main() {
             clientStorageData.height = message.data.h;
             saveClientStorageData();
             break;
+          case "atlasOptions":
+            clientStorageData.atlasMaxWidth = message.data.atlasMaxWidth;
+            clientStorageData.atlasMaxHeight = message.data.atlasMaxHeight;
+            clientStorageData.atlasMargin = message.data.atlasMargin;
+            saveClientStorageData();
+            break;
           case "export":{
             await exportDocument();
             break;

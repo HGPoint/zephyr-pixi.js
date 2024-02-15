@@ -9,6 +9,7 @@ import { delay } from '../plugin/Utils/utils';
 import { IBaseDocument } from '../common/IBaseDocument';
 import { Logger } from '../common/Logger';
 import { IBaseNode } from '../common/IBaseNode';
+import {clientStorageData} from "../plugin/ClientStorageData";
 
 //export let _figmaData = require("./figma.json");
 let _figmaData:IBaseDocument = {
@@ -211,7 +212,11 @@ function TreeSpritesheetsNode() {
             // } catch {
 
             // }
-            _spritesheets = await DocumentSpritesheets.build(_figmaData);
+            _spritesheets = await DocumentSpritesheets.build(_figmaData, {
+                atlasMaxWidth: clientStorageData.atlasMaxWidth,
+                atlasMaxHeight: clientStorageData.atlasMaxHeight,
+                margin: clientStorageData.atlasMargin,
+            });
             Logger.log("Spritesheets", _spritesheets);
             completeLoadingDialog();
         }

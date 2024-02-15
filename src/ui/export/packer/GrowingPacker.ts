@@ -1,8 +1,10 @@
 // https://github.com/gopherwood/node-bin-packing
 // https://github.com/jsmarkus/node-bin-packing
 
+
 export type PackerNode = {
-    key?: string,
+    id?: string;
+    name?: string,
     src?: string,
     used?: boolean,
     x?: number,

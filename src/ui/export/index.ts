@@ -1,5 +1,6 @@
 import { IBaseDocument } from "../../common/IBaseDocument"
 import { DocumentSpritesheets } from "../DocumentSpritesheets"
+import {ExportOptions} from "../../plugin/export";
 
 const JSZip = require('../../../node_modules/jszip/dist/jszip.js')
 
@@ -29,11 +30,11 @@ function exportTypeToFileExtension(type: string) {
   }
 }
 
-export async function exportData (data:any, figmaDocument:IBaseDocument) {
+export async function exportData (data:any, figmaDocument:IBaseDocument, options: ExportOptions) {
 
   const exportableBytes = data;
 
-  const atlases = await DocumentSpritesheets.build(figmaDocument);
+  const atlases = await DocumentSpritesheets.build(figmaDocument, options);
 
   return new Promise<void>(resolve => {
     let zip = new JSZip();

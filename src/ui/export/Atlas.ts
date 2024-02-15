@@ -159,9 +159,9 @@ class Atlas {
     return frames;
   }
 
-  pack(id: string, img: Drawable) {
+  pack(id: string, img: Drawable, x: number = NaN, y: number = NaN) {
     this._checkId(id);
-    return this._pack(id, this.tilepad ? createTiledImage(img) : img);
+    return this._pack(id, this.tilepad ? createTiledImage(img) : img, x, y);
   }
 
   expand(id: string, img: Drawable) {
@@ -197,12 +197,17 @@ class Atlas {
     if (this._terminalNodes[id]) throw new Error(`Duplicated texture id ${id}`);
   }
 
-  private _pack(id: string, img: Drawable) {
-    const rect = new Rect(0, 0, img.width, img.height)
+  private _pack(id: string, img: Drawable, x: number = NaN, y: number = NaN) {
+    let node: AtlasNode | null | undefined;
+    if (isNaN(x) || isNaN(y)) {
+      const rect = new Rect(0, 0, img.width, img.height)
+      node = this._rootNode.pack(rect, this.margin);
+    } else {
+      node = new AtlasNode(x, y, img.width, img.height);
+      node.filled = true;
+    }
 
-    const node = this._rootNode.pack(rect, this.margin);
     if (!node) return null;
-
     this._ontoCanvas(id, img, node.rect);
     this._terminalNodes[id] = node;
 

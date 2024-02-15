@@ -5,7 +5,10 @@ export const clientStorageData: IClientStorageData = {
     pages: "",
     url: "",
     width: 1100,
-    height: 800
+    height: 800,
+    atlasMaxWidth: 2048,
+    atlasMaxHeight: 2048,
+    atlasMargin: 2,
 };
   
 export function saveClientStorageData(){
@@ -20,6 +23,9 @@ export async function loadClientStorageData(){
         clientStorageData.width = clientStorage.width || clientStorageData.width;
         clientStorageData.height = clientStorage.height || clientStorageData.height;
         clientStorageData.pages = clientStorage.pages || clientStorageData.pages;
+        clientStorageData.atlasMaxWidth = clientStorage.atlasMaxWidth || clientStorageData.atlasMaxWidth;
+        clientStorageData.atlasMaxHeight = clientStorage.atlasMaxHeight || clientStorageData.atlasMaxHeight;
+        clientStorageData.atlasMargin = clientStorage.atlasMargin || clientStorageData.atlasMargin;
     }
     Logger.log("loadClientStorageData", JSON.stringify(clientStorageData));
 }
