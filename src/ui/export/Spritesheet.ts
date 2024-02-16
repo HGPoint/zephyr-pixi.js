@@ -6,6 +6,8 @@ import { resolve } from 'path';
 import {GrowingPacker, PackerNode} from "./packer/GrowingPacker";
 import {AtlasImage} from "./packer/PackerImage";
 import {Bitmap} from "../Bitmap";
+import {ExportOptions} from "../../plugin/export";
+import {PackerAtlas} from "./packer/PackerAtlas";
 
 function btoa(str:any) {
     var buffer;
@@ -23,35 +25,97 @@ export class Spritesheet {
     private _margin: number = 0;
     private _outputName: string;
     private _scaleBitmap: number = 1;
-    private _currentBitmapsAtlasIndex: number;
-    private _bitmaps: {src:string, name:string, width: number, height: number, x:number, y: number}[];
+    private _bitmaps: Bitmap[];
     private _bitmapsAtlases: Atlas[] = [];
+    private _growingPack: boolean;
+    private _width: number;
+    private _height: number;
 
-    constructor(width: number, height: number, bitmaps:Bitmap[], scaleBitmap:number, margin:number, outputName: string) {
+    constructor(width: number, height: number, bitmaps:Bitmap[], scaleBitmap:number, margin:number, outputName: string, growingPack: boolean) {
+        this._width = width;
+        this._height = height;
         this._margin = margin;
         this._outputName = outputName;
         this._scaleBitmap = scaleBitmap;
         this._bitmaps = bitmaps;
-        this._currentBitmapsAtlasIndex = 0;
-
         this._bitmapsAtlases = [];
+        this._growingPack = growingPack;
+    }
 
-        if (this._bitmaps.length > 0) {
-            var canvas = document.createElement('canvas');
-            canvas.width  = width;
-            canvas.height = height;
-            this._bitmapsAtlases[0] = new Atlas(canvas, {margin: margin});
+    public async build()
+    {
+        if (this._growingPack) {
+            const atlasesPack = this.getGrowingPackerAtlases(this._bitmaps, {
+                margin: this._margin,
+                atlasMaxWidth: this._width,
+                atlasMaxHeight: this._height,
+            });
+            for (let index = 0; index < atlasesPack.length; index ++) {
+                const currentAtlas = atlasesPack[index];
+                const images: Bitmap[] = currentAtlas.files.map(item => {
+                    return {
+                        name: item.name,
+                        id: item.id,
+                        width: item.width,
+                        height: item.height,
+                        src: item.src,
+                        x: item.x,
+                        y: item.y,
+                    }
+                });
+                this._bitmapsAtlases[index] = this.createBitmapAtlas(currentAtlas.width, currentAtlas.height);
+                await this.addImagesToAtlas(this._bitmapsAtlases[index], images);
+            }
+
+        } else {
+            this._bitmapsAtlases[0] = this.createBitmapAtlas(this._width, this._height);
+            await this.addImagesToAtlas(this._bitmapsAtlases[0], this._bitmaps);
         }
     }
 
-
-    async build() {
-        await this.addImages();
-
-        return await this.getOutput();
+    private createBitmapAtlas(width: number, height: number): Atlas
+    {
+        var canvas = document.createElement('canvas');
+        canvas.width  = width;
+        canvas.height = height;
+        return new Atlas(canvas, {margin: this._margin});
     }
 
-    async loadImage(base64img:string) {
+    private getGrowingPackerAtlases(images: Bitmap[], options: ExportOptions): PackerAtlas[]
+    {
+        const result: PackerAtlas[] = [];
+
+        let noFitImages: PackerNode[] = images.map(item =>
+        {
+            return {
+                id: item.id,
+                src: item.src,
+                name: item.name,
+                width: item.width + 2 * options.margin,
+                height: item.height + 2 * options.margin,
+                x: 0,
+                y: 0
+            };
+        });
+
+        while (noFitImages.length > 0) {
+            const packer = new GrowingPacker(options.atlasMaxWidth, options.atlasMaxHeight);
+            packer.fit(noFitImages);
+            const atlas = new PackerAtlas(packer);
+            noFitImages.forEach((item) =>
+            {
+                if (item.fit) {
+                    const image = new AtlasImage(item, options.margin);
+                    atlas.addImage(image);
+                }
+            });
+            result.push(atlas);
+            noFitImages = packer.nofit;
+        }
+        return result;
+    }
+
+    private async loadImage(base64img:string) {
         return new Promise(resolve => {
             var img = new Image();
             img.onload = function() {
@@ -61,19 +125,17 @@ export class Spritesheet {
         })
     }
 
-    async addImages() {
-        const bitmaps = this._bitmaps;
-
+    private async addImagesToAtlas(atlas: Atlas, bitmaps: Bitmap[]) {
         for (let bitmap of bitmaps) {
 
             const image = await this.loadImage(`${bitmap.src}`) as HTMLImageElement;
 
             const id = bitmap.name;
 
-            const node = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].pack(id, image, bitmap.x, bitmap.y);
+            const node = atlas.pack(id, image, bitmap.x, bitmap.y);
 
             if (!node) {
-                let expand = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].expand(id, image);
+                let expand = atlas.expand(id, image);
 
                 // this._currentBitmapsAtlasIndex++;
                 // this._bitmapsAtlases[this._currentBitmapsAtlasIndex] = new Atlas(createCanvas(this._size, this._size));
@@ -87,7 +149,7 @@ export class Spritesheet {
 
     }
 
-    async getOutput() {
+    public async getOutput() {
         const bitmaps = [];
 
         for (let i = 0; i < this._bitmapsAtlases.length; i++) {
@@ -96,7 +158,8 @@ export class Spritesheet {
             const atlas = this._bitmapsAtlases[i];
             //console.log("atlas", atlas);
 
-            const bitmapsAtlasFileName = `${this._outputName}`;
+            const suffix = this._bitmapsAtlases.length > 1 ? `_${i}` : '';
+            const bitmapsAtlasFileName = `${this._outputName}${suffix}`;
             const imageBitmaps = canvas.toDataURL();//.replace(/^data:image\/png;base64,/, '');
 
             const bitmapsData = {

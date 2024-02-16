@@ -109,23 +109,24 @@ export class DocumentSpritesheets
         return images;
     }
 
-    public static async buildAtlas(width: number, height: number, images: Bitmap[], key: string, margin: number = 1)
+    public static async buildAtlases(images: Bitmap[], key: string, growingPack: boolean, exportOptions?: ExportOptions)
     {
-        const atlas = new Spritesheet(width, height, images, 1, margin, key);
-        await atlas.addImages();
+        const width = exportOptions?.atlasMaxWidth ?? 48;
+        const height = exportOptions?.atlasMaxHeight ?? 48;
+        const margin = exportOptions?.margin ?? 1;
+
+        const atlas = new Spritesheet(width, height, images, 1, margin, key, growingPack);
+        await atlas.build();
         const result = await atlas.getOutput();
-
-        //console.log("result:", result);
-
-        if (result && result.bitmaps[0]) {
-            return result.bitmaps[0]
+        if (result && result.bitmaps) {
+            return result.bitmaps;
         }
+
         return null;
     }
 
     public static async build(data: IBaseDocument, options: ExportOptions)
     {
-
         const nodeResourcesIds: Array<{
             key: string;
             id: string;
@@ -174,72 +175,26 @@ export class DocumentSpritesheets
         const atlases = [];
 
         const images = this.prepareImages(data, matchResourcesIds);
-
-        const commonCalculatedAtlases = this.getGrowingPackerAtlases(images, options);
-        console.log(`commonCalculatedAtlases`, commonCalculatedAtlases);
-        for (let index = 0; index < commonCalculatedAtlases.length; index ++) {
-            const currentAtlas = commonCalculatedAtlases[index];
-            const images: Bitmap[] = currentAtlas.files.map(item => {
-                return {
-                    name: item.name,
-                    id: item.id,
-                    width: item.width,
-                    height: item.height,
-                    src: item.src,
-                    x: item.x,
-                    y: item.y,
-                }
-            });
-            atlases.push(await this.buildAtlas(currentAtlas.width, currentAtlas.height, images, `common_${index}`, options.margin));
+        const commonAtlases = await this.buildAtlases(images, 'common', true, options);
+        if (commonAtlases && commonAtlases.length) {
+            atlases.push(...commonAtlases)
         }
-
-        // old version
-        //atlases.push(await this.buildAtlas(images, "common"));
-
         for (let i = 0; i < nodeResourcesIds.length; i++) {
             const images = this.prepareImages(data, nodeResourcesIds[i].data);
-            const atlas = await this.buildAtlas(48, 48, images, nodeResourcesIds[i].key);
-            if (atlas) {
-                //@ts-ignore
-                atlas["node_id"] = nodeResourcesIds[i].id;
-            }
-            atlases.push(atlas);
+            const currentAtlases = await this.buildAtlases(images, nodeResourcesIds[i].key, false);
+            currentAtlases?.forEach(atlas => {
+                if (atlas) {
+                    if (atlas) {
+                        //@ts-ignore
+                        atlas["node_id"] = nodeResourcesIds[i].id;
+                    }
+                    currentAtlases.push(atlas);
+                }
+            })
+            // @ts-ignore
+            atlases.push(...currentAtlases);
         }
 
         return atlases;
-    }
-
-    private static getGrowingPackerAtlases(images: Bitmap[], options: ExportOptions): PackerAtlas[]
-    {
-        const result: PackerAtlas[] = [];
-
-        let noFitImages: PackerNode[] = images.map(item =>
-        {
-            return {
-                id: item.id,
-                src: item.src,
-                name: item.name,
-                width: item.width + 2 * options.margin,
-                height: item.height + 2 * options.margin,
-                x: 0,
-                y: 0
-            };
-        });
-
-        while (noFitImages.length > 0) {
-            const packer = new GrowingPacker(options.atlasMaxWidth, options.atlasMaxHeight);
-            packer.fit(noFitImages);
-            const atlas = new PackerAtlas(packer);
-            noFitImages.forEach((item) =>
-            {
-                if (item.fit) {
-                    const image = new AtlasImage(item, options.margin);
-                    atlas.addImage(image);
-                }
-            });
-            result.push(atlas);
-            noFitImages = packer.nofit;
-        }
-        return result;
     }
 }
