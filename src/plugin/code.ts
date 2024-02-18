@@ -1,3 +1,5 @@
+import {IBaseDocument} from "../common/IBaseDocument";
+
 Logger.log("start");
 
 import { BaseContainer } from "./Nodes/BaseNodeContainer";
@@ -23,18 +25,20 @@ async function main() {
         switch(message.type){
           case "apply":
             {
-              const data:{target:string|undefined} = message.data;
+              const data:{target:string|undefined, filteredIds: string[]} = message.data;
               if(data.target){
                 await updateDocument(false, data.target);
                 figma.ui.postMessage({type: "targetView", data: {
                     document: BaseDocument.current,
+                    filteredIds: data.filteredIds.concat(),
                     target: data.target
                   } 
                 }, { origin: "*" });
               } else {
                 await updateDocument(true);
                 figma.ui.postMessage({type: "currentPage", data: {
-                    document: BaseDocument.current
+                    document: BaseDocument.current,
+                    filteredIds: data.filteredIds.concat(),
                   } 
                 }, { origin: "*" });
               }

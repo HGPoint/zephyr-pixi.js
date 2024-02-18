@@ -10,6 +10,7 @@ import { IBaseDocument } from '../common/IBaseDocument';
 import { Logger } from '../common/Logger';
 import { IBaseNode } from '../common/IBaseNode';
 import {clientStorageData} from "../plugin/ClientStorageData";
+import {DocumentFilter} from "./DocumentFilter";
 
 //export let _figmaData = require("./figma.json");
 let _figmaData:IBaseDocument = {
@@ -194,7 +195,7 @@ function TreeSpritesheetNode({ spritesheet }:{spritesheet:any}) {
   
     return (
       <li>
-        <a onClick={handleClick}> <img width={24} height={24} className="w-4 h-4" src={require("./icons/img.svg")}/> {node?.name} ({name}) </a>
+          <a onClick={handleClick}> <img width={24} height={24} className="w-4 h-4" src={require("./icons/img.svg")}/> {node?.name} ({name}) </a>
       </li>
     );
 }
@@ -212,6 +213,8 @@ function TreeSpritesheetsNode() {
             // } catch {
 
             // }
+
+
             _spritesheets = await DocumentSpritesheets.build(_figmaData, {
                 atlasMaxWidth: clientStorageData.atlasMaxWidth,
                 atlasMaxHeight: clientStorageData.atlasMaxHeight,
@@ -248,7 +251,7 @@ function TreeViewNode({ node, path }:{node:any, path: string }) {
       Logger.log("node", node);
       openLoadingDialog();
       await delay(100);
-      parent.postMessage({ pluginMessage: { type: "apply", data: { target: `${path}.${node.name}` } } }, "*");
+      parent.postMessage({ pluginMessage: { type: "apply", data: { target: `${path}.${node.name}`, filteredIds: DocumentFilter.instance.getSelectedIds() } } }, "*");
     };
   
     return (
@@ -259,18 +262,25 @@ function TreeViewNode({ node, path }:{node:any, path: string }) {
   }
 
 function TreeSectorsNode({ node }:{node:any}) {
-  const { name } = node;
+  const { name, id } = node;
 
   const [showChildren, setShowChildren] = React.useState(false);
+  let [checked, setChecked] = React.useState(DocumentFilter.instance.getSelectedById(id));
+  checked = DocumentFilter.instance.getSelectedById(id);
 
   const handleClick = () => {
     setShowChildren(!showChildren);
   };
 
+  const handleChange = () => {
+      setChecked(!checked)
+      DocumentFilter.instance.setSelectedById(id, !checked);
+  }
+
   return (
     <li>
       <details open={false}>
-        <summary onClick={handleClick} > <img width={24} height={24} className="w-4 h-4" src={require("./icons/folder.svg")}/> {name} </summary>
+        <summary onClick={handleClick} > <input onChange={handleChange} checked={checked} type="checkbox" className="checkbox checkbox-xs"/> <img width={24} height={24} className="w-4 h-4" src={require("./icons/folder.svg")}/> {name} </summary>
         <ul>
           {showChildren && node._children.map((childNode:any) => (
             <TreeViewNode node={childNode} path={`${node.name}`} key={childNode.id} />
@@ -288,19 +298,43 @@ export class DocumentTree extends React.Component {
   state = {
     counter: 0,
     figmaData: _figmaData,
+    allSelected: true,
   };
 
   render() {
 
-    updateTree = (figmaData) => {
+      const handleAllCheckedChange = () => {
+          this.setState({
+              allSelected: !this.state.allSelected
+          });
+          if (this.state.allSelected) {
+              DocumentFilter.instance.deselectAll();
+          } else {
+              DocumentFilter.instance.selectAll();
+          }
+      }
+
+      updateTree = (figmaData) => {
+        Logger.log(`updateTree`);
+
         _figmaData = figmaData;
 
-      this.setState({ 
+        if (!DocumentFilter.instance.initialized) {
+            DocumentFilter.instance.init(_figmaData._children.map(child => child.id), () => {
+                setNavigationBarCount(DocumentFilter.instance.selectedCount, this.state.figmaData._children.length);
+                this.setState({
+                    allSelected: DocumentFilter.instance.allSelected
+                });
+                DocumentFilter.instance.log();
+            });
+        }
+
+      this.setState({
         counter: ++this.state.counter,
         figmaData: figmaData
       });
 
-      setNavigationBarCount(this.state.figmaData._children.length);
+      setNavigationBarCount(DocumentFilter.instance.selectedCount, this.state.figmaData._children.length);
     };
 
     return (
@@ -329,7 +363,7 @@ export class DocumentTree extends React.Component {
         </li>
         <li>
           <details open={false}>
-            <summary> <img width={24} height={24} className="w-4 h-4" src={require("./icons/folder.svg")}/> Views </summary>
+            <summary> <input type="checkbox" checked={this.state.allSelected} onChange={handleAllCheckedChange} className="checkbox checkbox-xs"/> <img width={24} height={24} className="w-4 h-4" src={require("./icons/folder.svg")}/> Views </summary>
             <ul>
               {this.state.figmaData._children.map((node:any) => (
                 <TreeSectorsNode node={node} key={node.id} />

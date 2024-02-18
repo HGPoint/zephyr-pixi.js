@@ -8,6 +8,8 @@ import { DocumentTree, ImageDialog, SpritesheetDialog, updateTree } from './Docu
 import { LoadingDialog, completeLoadingDialog, openLoadingDialog, setProgressLoadingDialog } from './LoadingDialog';
 import { SettingsDialog, openSettingsDialog, setSettingsWindowData } from './SettingsDialog';
 import { NavigationBar, setNavigationBar } from './NavigationBar';
+import {IBaseDocument} from "../common/IBaseDocument";
+import {BaseDocument} from "../plugin/Page/BaseDocument";
 
 declare function require(path: string): any;
 
@@ -83,12 +85,19 @@ const App = (props:any) => {
             }
             break;
         case "targetView":
-            { 
-              
+            {
+              const baseDocument: IBaseDocument = data.document as IBaseDocument;
+              const filteredDocument: IBaseDocument = {
+                atlases: baseDocument.atlases,
+                _images: baseDocument._images,
+                _children: baseDocument._children.filter(item => !data.filteredIds || data.filteredIds.includes(item.id)),
+                components: baseDocument.components,
+              }
+
               updateTree(data.document);
               const message = JSON.stringify({
                 op: "targetView",
-                data: data.document,
+                data: filteredDocument,
                 target: data.target
               });
               iframe.contentWindow?.postMessage(message, "*");
@@ -99,11 +108,18 @@ const App = (props:any) => {
         case "currentPage":
           {
             //console.log("currentPage", data);
+            const baseDocument: IBaseDocument = data.document as IBaseDocument;
+            const filteredDocument: IBaseDocument = {
+              atlases: baseDocument.atlases,
+              _images: baseDocument._images,
+              _children: baseDocument._children.filter(item => !data.filteredIds || data.filteredIds.includes(item.id)),
+              components: baseDocument.components,
+            }
 
             updateTree(data.document);
             const message = JSON.stringify({
               op: "currentPage",
-              data: data.document
+              data: filteredDocument
             });
 
             iframe.contentWindow?.postMessage(message, "*");
