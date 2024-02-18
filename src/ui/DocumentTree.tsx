@@ -280,7 +280,8 @@ function TreeSectorsNode({ node }:{node:any}) {
   return (
     <li>
       <details open={false}>
-        <summary onClick={handleClick} > <input onChange={handleChange} checked={checked} type="checkbox" className="checkbox checkbox-xs"/> <img width={24} height={24} className="w-4 h-4" src={require("./icons/folder.svg")}/> {name} </summary>
+        <input onChange={handleChange} checked={checked} type="checkbox" className="checkbox checkbox-xs"/>
+        <summary onClick={handleClick} > <img width={24} height={24} className="w-4 h-4" src={require("./icons/folder.svg")}/> {name} </summary>
         <ul>
           {showChildren && node._children.map((childNode:any) => (
             <TreeViewNode node={childNode} path={`${node.name}`} key={childNode.id} />

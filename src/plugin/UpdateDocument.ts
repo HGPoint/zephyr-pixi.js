@@ -1,5 +1,5 @@
 import { Logger } from "../common/Logger";
-import { BaseContainer } from "./Nodes/BaseNodeContainer";
+import {BaseContainer, IInstanceNodeProp} from "./Nodes/BaseNodeContainer";
 import { RectangleNodeContainer } from "./Nodes/RectangleNodeContainer";
 import { TextNodeContainer } from "./Nodes/TextNodeContainer";
 import { BaseDocument, loadProgress } from "./Page/BaseDocument";
@@ -42,8 +42,20 @@ function build(node:SceneNode, container: BaseContainer){
 
 }
 
+function getAllMainComponentIdsFrom(container: BaseContainer): string[] {
+    const result: string[] = [];
+    container._children.forEach(item => {
+        if (item.type === 'INSTANCE') {
+            const id = (item.properties as IInstanceNodeProp).mainComponent;
+            id && result.push(id);
+        } else {
+            result.push(...getAllMainComponentIdsFrom(item));
+        }
+    })
+    return result;
+}
 let _loaded = false;
-export async function updateDocument(load:boolean = true, target = "") {
+export async function updateDocument(load:boolean = true, target = "", filteredIds: string[] = []) {
 
     if(_loaded && target){
         return;
@@ -56,8 +68,9 @@ export async function updateDocument(load:boolean = true, target = "") {
     loadProgress(0, `LOADING....NODES`);
     await delay(50);
 
-    figma.root.children.forEach(page => {
+    const componentIdsToLoad: string[] = [];
 
+    figma.root.children.forEach(page => {
       page.children.forEach((child) => {
             if(!child.name.startsWith("$")){
                 return;
@@ -68,27 +81,30 @@ export async function updateDocument(load:boolean = true, target = "") {
             // }
             let t0 = performanceNow();
             const container = new BaseContainer(child);
-      
+
             build(child, container);
         
             BaseDocument.current.addChild(container);
 
-            
             let t1 = performanceNow();
             let delay = t1 - t0;
             Logger.log(`${child.name} buid time`, delay);
+
+            // если будем загружать и контейнер выбран, то находим все компоненты, которые надо загрузить
+            if ((load || (target && target.length > 0) ) && filteredIds.includes(container.id)) {
+                const mainComponents = getAllMainComponentIdsFrom(container);
+                componentIdsToLoad.push(...mainComponents);
+            }
+
       });
 
     });
 
-    load && await currentDocument.load();
-
-    _loaded = _loaded || load;
-
-    if(!_loaded && target){
-        await currentDocument.load();
-        _loaded = true;
+    if (load || (target && target.length > 0)) {
+        let t0 = performanceNow();
+        await currentDocument.load(componentIdsToLoad);
+        let t1 = performanceNow();
+        let delay = t1 - t0;
+        console.log(`Load time seconds: ${delay}`);
     }
-
-    Logger.log("UpdateDocument", BaseDocument.current);
 }

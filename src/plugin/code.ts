@@ -27,7 +27,7 @@ async function main() {
             {
               const data:{target:string|undefined, filteredIds: string[]} = message.data;
               if(data.target){
-                await updateDocument(false, data.target);
+                await updateDocument(false, data.target, data.filteredIds);
                 figma.ui.postMessage({type: "targetView", data: {
                     document: BaseDocument.current,
                     filteredIds: data.filteredIds.concat(),
@@ -35,7 +35,7 @@ async function main() {
                   } 
                 }, { origin: "*" });
               } else {
-                await updateDocument(true);
+                await updateDocument(true, undefined, data.filteredIds);
                 figma.ui.postMessage({type: "currentPage", data: {
                     document: BaseDocument.current,
                     filteredIds: data.filteredIds.concat(),
