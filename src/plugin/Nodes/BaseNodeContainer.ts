@@ -41,6 +41,7 @@ export interface IBaseFrameNodeProp extends IDefaultNode {
 
 export interface IInstanceNodeProp extends IDefaultNode {
     opacity: number;
+    rotation: number;
     mainComponent: string | null;
     constraints: {
         horizontal: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE',
@@ -91,6 +92,7 @@ export interface ITextNodeProp extends IDefaultNode {
     } | null;
     characters: string;
     strokeWeight: number;
+    rotation: number;
 }
 
 export class BaseContainer implements IBaseNode {
@@ -147,6 +149,7 @@ export class BaseContainer implements IBaseNode {
         } else if(node.type == "INSTANCE"){
             this.properties =  {
                 opacity: node.opacity,
+                rotation: node.rotation,
                 mainComponent: node.mainComponent?.id,
                 layoutPositioning: node.layoutPositioning,
                 layoutSizingHorizontal: node.layoutSizingHorizontal,
@@ -215,6 +218,7 @@ export class BaseContainer implements IBaseNode {
                 layoutPositioning: node.layoutPositioning,
                 layoutSizingHorizontal: node.layoutSizingHorizontal,
                 layoutSizingVertical: node.layoutSizingVertical,
+                rotation: node.rotation,
             } as ITextNodeProp
         } else if(node.type == "RECTANGLE"){
             this.properties = {
