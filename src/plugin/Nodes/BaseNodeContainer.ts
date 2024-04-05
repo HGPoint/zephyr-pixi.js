@@ -12,6 +12,10 @@ export interface IDefaultNode {
     layoutPositioning: 'AUTO' | 'ABSOLUTE'
     layoutSizingHorizontal: 'FIXED' | 'HUG' | 'FILL'
     layoutSizingVertical: 'FIXED' | 'HUG' | 'FILL'
+    constraints: {
+        horizontal: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE',
+        vertical: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE'
+    };
 }
 
 export interface IBaseFrameNodeProp extends IDefaultNode {
@@ -43,10 +47,6 @@ export interface IInstanceNodeProp extends IDefaultNode {
     opacity: number;
     rotation: number;
     mainComponent: string | null;
-    constraints: {
-        horizontal: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE',
-        vertical: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE'
-    };
     overrides: {
         id: string
         overriddenFields: {
@@ -133,6 +133,7 @@ export class BaseContainer implements IBaseNode {
                 counterAxisSizingMode: node.counterAxisSizingMode, 
                 primaryAxisAlignItems: node.primaryAxisAlignItems,
                 counterAxisAlignItems: node.counterAxisAlignItems,
+                constraints: node.constraints,
                 layoutPositioning: node.layoutPositioning,
                 layoutSizingHorizontal: node.layoutSizingHorizontal,
                 layoutSizingVertical: node.layoutSizingVertical,
@@ -181,6 +182,7 @@ export class BaseContainer implements IBaseNode {
                 textAlignHorizontal: node.textAlignHorizontal,
                 textAlignVertical: node.textAlignVertical,
                 textAutoResize: node.textAutoResize,
+                constraints: node.constraints,
                 autoRename: node.autoRename,
                 textStyleId: node.textStyleId,
                 paragraphIndent: node.paragraphIndent,
@@ -227,6 +229,7 @@ export class BaseContainer implements IBaseNode {
                 layoutPositioning: node.layoutPositioning,
                 layoutSizingHorizontal: node.layoutSizingHorizontal,
                 layoutSizingVertical: node.layoutSizingVertical,
+                constraints: node.constraints,
             } as IRectangleNodeProp;
         }
 
