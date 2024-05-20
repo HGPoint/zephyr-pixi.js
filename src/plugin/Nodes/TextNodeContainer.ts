@@ -1,6 +1,7 @@
 import { BaseContainer } from "./BaseNodeContainer";
 import { ImagePaintContainer } from "../Paint/ImagePaintContainer";
 import { SolidPaintContainer } from "../Paint/SolidPaintContainer";
+import { GradientPaintContainer } from "../Paint/GradientPaintContainer";
 import { VectorPath } from "./RectangleNodeContainer";
 import { DropShadowEffectContainer } from "../Effects/DropShadowEffect";
 import { InnerShadowEffectContainer } from "../Effects/InnerShadowEffect";
@@ -9,7 +10,7 @@ import { Logger } from "../../common/Logger";
 export class TextNodeContainer extends BaseContainer {
 
     public strokes: Array<ImagePaintContainer | SolidPaintContainer> = [];
-    public fill: Array<ImagePaintContainer | SolidPaintContainer> = [];
+    public fill: Array<ImagePaintContainer | SolidPaintContainer | GradientPaintContainer> = [];
     public effects: Array<DropShadowEffectContainer | InnerShadowEffectContainer> = [];
     public fillGeometry: Array<VectorPath> = [];
 
@@ -27,6 +28,10 @@ export class TextNodeContainer extends BaseContainer {
                         }
                         case 'SOLID': {
                             this.fill.push(new SolidPaintContainer(fill));
+                            break;
+                        }
+                        case 'GRADIENT_LINEAR': {
+                            this.fill.push(new GradientPaintContainer(fill));
                             break;
                         }
                         default: {
