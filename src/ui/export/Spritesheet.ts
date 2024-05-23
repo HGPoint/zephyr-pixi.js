@@ -25,7 +25,7 @@ export class Spritesheet {
     private _bitmaps: {src:string;name:string}[];
     private _bitmapsAtlases: Atlas[] = [];
 
-    constructor(size:number, bitmaps:{src:string;name:string}[], scaleBitmap:number, margin:number, outputName: string) {
+    constructor(size:number, bitmaps:{src:string;name:string}[], scaleBitmap:number, margin:number, outputName: string, private _expand = true) {
         this._margin = margin;
         this._size = size;
         this._outputName = outputName;
@@ -61,27 +61,87 @@ export class Spritesheet {
 
     async addImages() {
         const bitmaps = this._bitmaps;
+        // const images:Array<{
+        //     image: HTMLImageElement,
+        //     id: string
+        // }> = []
 
-        for (let bitmap of bitmaps) {
+        // for (let bitmap of bitmaps) {
 
-            const image = await this.loadImage(`${bitmap.src}`) as HTMLImageElement;
+        //     const image = await this.loadImage(`${bitmap.src}`) as HTMLImageElement;
 
-            const id = bitmap.name;
+        //     images.push({
+        //         image: image,
+        //         id: bitmap.name
+        //     });
+        // }
 
-            const node = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].pack(id, image);
+        // const sortedImages = images.sort(function (a, b) {
+        //     // Compute the area of each image
+        //     var aArea = a.image.width * a.image.height,
+        //         bArea = b.image.width * b.image.height;
+        //     // compare the area of each
+        //     return aArea - bArea;
+        // });
 
-            if (!node) {
-                let expand = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].expand(id, image);
+        while(bitmaps.length > 0){
+            
+            for (let i = bitmaps.length - 1; i >= 0; i--) {
+                const bitmap = bitmaps[i];
 
-                // this._currentBitmapsAtlasIndex++;
-                // this._bitmapsAtlases[this._currentBitmapsAtlasIndex] = new Atlas(createCanvas(this._size, this._size));
+                const image = await this.loadImage(`${bitmap.src}`) as HTMLImageElement;
 
-                // node = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].pack(id, image);
-                // if (!node){
-                //     console.log("can't pack image, try to increase spritesheet size", image);
-                // }
+                const id = bitmap.name;
+
+                let node = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].pack(id, image);
+
+                if (node) {
+                    bitmaps.splice(i, 1);
+                } else {
+                    if(this._expand){
+                        let expand = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].expand(id, image);
+                        bitmaps.splice(i, 1);
+                    }
+                }
+            }
+
+            if(bitmaps.length > 0){
+                this._currentBitmapsAtlasIndex++;
+                var canvas = document.createElement('canvas');
+                canvas.width  = this._size;
+                canvas.height = this._size;
+                this._bitmapsAtlases[this._currentBitmapsAtlasIndex] = new Atlas(canvas, {margin: this._margin});
             }
         }
+
+        // for (let bitmap of bitmaps) {
+
+        //     const image = await this.loadImage(`${bitmap.src}`) as HTMLImageElement;
+
+        //     const id = bitmap.name;
+
+        //     let node = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].pack(id, image);
+
+        //     if (!node) {
+
+        //         if(this._expand){
+        //             let expand = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].expand(id, image);
+        //         } else {
+        //             this._currentBitmapsAtlasIndex++;
+        //             var canvas = document.createElement('canvas');
+        //             canvas.width  = this._size;
+        //             canvas.height = this._size;
+        //             this._bitmapsAtlases[this._currentBitmapsAtlasIndex] = new Atlas(canvas, {margin: this._margin});
+
+        //             node = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].pack(id, image);
+        //             if (!node){
+        //                 let expand = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].expand(id, image);
+        //                 console.log("can't pack image, try to increase spritesheet size", item);
+        //             }
+        //         }
+
+        //     }
+        // }
 
     }
 
@@ -94,7 +154,10 @@ export class Spritesheet {
             const atlas = this._bitmapsAtlases[i];
             //console.log("atlas", atlas);
 
-            const bitmapsAtlasFileName = `${this._outputName}`;
+            let bitmapsAtlasFileName = `${this._outputName}`;
+            if(i > 0){
+                bitmapsAtlasFileName += `_${i}`;
+            }
             const imageBitmaps = canvas.toDataURL();//.replace(/^data:image\/png;base64,/, '');
 
             const bitmapsData = {

@@ -58,7 +58,7 @@ export class DocumentSpritesheets {
         return a;
     }
 
-    public static async buildAtlas (data:IBaseDocument, sprites:string[], key:string) {
+    public static async buildAtlas (size:number, data:IBaseDocument, sprites:string[], key:string, expand = true) {
         const components = data.components._components;
         const componentSets =  data.components._componentSets;
 
@@ -98,16 +98,16 @@ export class DocumentSpritesheets {
 
         //console.log("atlasimages:", atlasimages);
 
-        const atlas = new Spritesheet(48, atlasimages, 1, 1, key);
+        const atlas = new Spritesheet(size, atlasimages, 1, 1, key, expand);
         await atlas.addImages();
         const result = await atlas.getOutput();
         
         //console.log("result:", result);
 
-        if(result && result.bitmaps[0]){
-            return result.bitmaps[0]
+        if(result){
+            return result.bitmaps
         }
-        return null;
+        return [];
     }
 
     public static async build(data:IBaseDocument){
@@ -158,15 +158,15 @@ export class DocumentSpritesheets {
 
         const atlases = [];
           
-        atlases.push(await this.buildAtlas(data, matchResourcesIds, "common"));
+        atlases.push(...await this.buildAtlas(2048, data, matchResourcesIds, "common", false));
 
         for (let i = 0; i < nodeResourcesIds.length; i++) {
-            const atlas = await this.buildAtlas(data, nodeResourcesIds[i].data, nodeResourcesIds[i].key);
+            const atlas = await this.buildAtlas(48, data, nodeResourcesIds[i].data, nodeResourcesIds[i].key);
             if(atlas){
                 //@ts-ignore
                 atlas["node_id"] = nodeResourcesIds[i].id;
             }
-            atlases.push(atlas);
+            atlases.push(...atlas);
         }
 
         return atlases;
