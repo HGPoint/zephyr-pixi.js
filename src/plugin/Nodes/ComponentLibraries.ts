@@ -258,13 +258,13 @@ export class ComponentLibraries {
             componentNode.componentSetId = componentSetNode.id;
 
             //Show problem variants
-            //if (node.mainComponent.absoluteBoundingBox?.width != node.mainComponent.absoluteRenderBounds?.width || node.mainComponent.absoluteBoundingBox?.height != node.mainComponent.absoluteRenderBounds?.height)
-                //console.warn("- - - " + node.mainComponent.id + " " + node.mainComponent.parent.name + " " + node.mainComponent.name + " " + node.mainComponent.absoluteRenderBounds?.width + " " + node.mainComponent.absoluteRenderBounds?.height);
+            if (node.mainComponent.absoluteBoundingBox?.width != node.mainComponent.absoluteRenderBounds?.width || node.mainComponent.absoluteBoundingBox?.height != node.mainComponent.absoluteRenderBounds?.height)
+                console.warn("WARNING: Variant has wrong size: " + node.mainComponent.id + " " + node.mainComponent.parent.name + " " + node.mainComponent.name + " " + node.mainComponent.absoluteRenderBounds?.width + " " + node.mainComponent.absoluteRenderBounds?.height);
 
         } else {
             //Show problem components
-            //if (node.mainComponent.absoluteBoundingBox?.width != node.mainComponent.absoluteRenderBounds?.width || node.mainComponent.absoluteBoundingBox?.height != node.mainComponent.absoluteRenderBounds?.height)
-                //console.warn("- - - " + node.mainComponent.id + " " + node.mainComponent.name + " " + node.mainComponent.absoluteRenderBounds?.width + " " + node.mainComponent.absoluteRenderBounds?.height);
+            if (node.mainComponent.absoluteBoundingBox?.width != node.mainComponent.absoluteRenderBounds?.width || node.mainComponent.absoluteBoundingBox?.height != node.mainComponent.absoluteRenderBounds?.height)
+                console.warn("WARNING: Component has wrong size: " + node.mainComponent.id + " " + node.mainComponent.name + " " + node.mainComponent.absoluteRenderBounds?.width + " " + node.mainComponent.absoluteRenderBounds?.height);
         }
     }
 }
