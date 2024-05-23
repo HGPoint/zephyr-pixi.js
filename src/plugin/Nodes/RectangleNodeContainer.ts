@@ -1,6 +1,7 @@
 import { BaseContainer, IRectangleNodeProp } from "./BaseNodeContainer";
 import { ImagePaintContainer } from "../Paint/ImagePaintContainer";
 import { SolidPaintContainer } from "../Paint/SolidPaintContainer";
+import { GradientPaintContainer } from "../Paint/GradientPaintContainer";
 import { Logger } from "../../common/Logger";
 
 export class VectorPath {
@@ -10,7 +11,7 @@ export class VectorPath {
 
 export class RectangleNodeContainer extends BaseContainer {
 
-    private _fill: Array<ImagePaintContainer | SolidPaintContainer> = [];
+    private _fill: Array<ImagePaintContainer | SolidPaintContainer | GradientPaintContainer> = [];
     public get fill() {
         return this._fill;
     }
@@ -33,6 +34,10 @@ export class RectangleNodeContainer extends BaseContainer {
                 }
                 case 'SOLID': {
                     this._fill.push(new SolidPaintContainer(fill));
+                    break;
+                }
+                case 'GRADIENT_LINEAR': {
+                    this.fill.push(new GradientPaintContainer(fill));
                     break;
                 }
                 default: {
