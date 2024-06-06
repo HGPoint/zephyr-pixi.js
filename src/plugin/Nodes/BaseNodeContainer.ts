@@ -8,6 +8,10 @@ export interface IDefaultNode {
     y: number
     width: number
     height: number
+    minWidth: number | null
+    minHeight: number | null
+    maxWidth: number | null
+    maxHeight: number | null
     absoluteBoundingBox: Rect | null
     layoutPositioning: 'AUTO' | 'ABSOLUTE'
     layoutSizingHorizontal: 'FIXED' | 'HUG' | 'FILL'
@@ -236,6 +240,10 @@ export class BaseContainer implements IBaseNode {
         if(this.properties){
             this.properties.height = node.height;
             this.properties.width = node.width;
+            this.properties.minWidth = node.minWidth;
+            this.properties.minHeight = node.minHeight;
+            this.properties.maxWidth = node.maxWidth;
+            this.properties.maxHeight = node.maxHeight;
             this.properties.x = node.x;
             this.properties.y = node.y;
             this.properties.absoluteTransform = [
