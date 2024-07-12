@@ -56,30 +56,47 @@ export async function updateDocument(load:boolean = true, target = "") {
     loadProgress(0, `LOADING....NODES`);
     await delay(50);
 
+    let children:Array<SceneNode> = [];
     figma.root.children.forEach(page => {
 
-      page.children.forEach((child) => {
-            if(!child.name.startsWith("$")){
-                return;
-            }
-
-            // if(child.name != "$booster_unlocked_window" && child.name != "$BOOSTER_BUY"){
-            //     return;
-            // }
-            let t0 = performanceNow();
-            const container = new BaseContainer(child);
-      
-            build(child, container);
-        
-            BaseDocument.current.addChild(container);
-
-            
-            let t1 = performanceNow();
-            let delay = t1 - t0;
-            Logger.log(`${child.name} buid time`, delay);
-      });
-
+        page.children.forEach((child) => {
+              if(!child.name.startsWith("$")){
+                  return;
+              }
+              children.push(child)
+        });
+  
     });
+
+    let index = 0;
+    let timeTotal = 0;
+    for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        if(!child.name.startsWith("$")){
+            return;
+        }
+        // if(child.name != "$booster_unlocked_window" && child.name != "$BOOSTER_BUY"){
+        //     return;
+        // }
+        let t0 = performanceNow();
+        const container = new BaseContainer(child);
+    
+        build(child, container);
+    
+        BaseDocument.current.addChild(container);
+
+        
+        let t1 = performanceNow();
+        let timeDelay = t1 - t0;
+        Logger.log(`${child.name} buid time`, timeDelay);
+        timeTotal += timeDelay;
+
+        index++;
+
+        let progress = index/children.length;
+        loadProgress(progress, `LOADING....NODES ${index}/${children.length} ${child.name}`);// ${Math.floor(timeTotal/60)}:${Math.floor(timeTotal%60)}
+        (!(index%3) || progress === 1) && await delay(30);
+    }
 
     load && await currentDocument.load();
 

@@ -157,7 +157,7 @@ export class DocumentSpritesheets {
         }
 
         const atlases = [];
-          
+
         atlases.push(...await this.buildAtlas(2048, data, matchResourcesIds, "common", false));
 
         for (let i = 0; i < nodeResourcesIds.length; i++) {

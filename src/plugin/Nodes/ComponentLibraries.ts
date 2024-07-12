@@ -1,5 +1,14 @@
 import { Logger } from "../../common/Logger";
 
+export const warnings:{
+    [id:string]:{
+        name: string,
+        pageId: string,
+        type: "warning",
+        title: string
+    }
+} = {};
+
 class Queue<T> {
   
     public constructor(

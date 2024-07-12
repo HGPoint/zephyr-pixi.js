@@ -4,6 +4,8 @@ import Rect from './Rect';
 import Atlas, { Drawable } from './Atlas';
 import { resolve } from 'path';
 
+const md5 = require('./md5');
+
 function btoa(str:any) {
     var buffer;
 
@@ -84,6 +86,8 @@ export class Spritesheet {
         //     return aArea - bArea;
         // });
 
+        let bitmapHashs: Array<string> = [];
+
         while(bitmaps.length > 0){
             
             for (let i = bitmaps.length - 1; i >= 0; i--) {
@@ -97,15 +101,21 @@ export class Spritesheet {
 
                 if (node) {
                     bitmaps.splice(i, 1);
+                    bitmapHashs.push(md5(bitmap.src));
                 } else {
                     if(this._expand){
                         let expand = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].expand(id, image);
                         bitmaps.splice(i, 1);
+                        bitmapHashs.push(md5(bitmap.src));
                     }
                 }
             }
 
+            const atlasHash = md5(bitmapHashs.join("_"));
+            this._bitmapsAtlases[this._currentBitmapsAtlasIndex].hash = atlasHash;
+
             if(bitmaps.length > 0){
+                bitmapHashs = [];
                 this._currentBitmapsAtlasIndex++;
                 var canvas = document.createElement('canvas');
                 canvas.width  = this._size;
@@ -113,6 +123,7 @@ export class Spritesheet {
                 this._bitmapsAtlases[this._currentBitmapsAtlasIndex] = new Atlas(canvas, {margin: this._margin});
             }
         }
+
 
         // for (let bitmap of bitmaps) {
 
@@ -165,7 +176,7 @@ export class Spritesheet {
                 meta: {
                     app: "hg",
                     scale: this._scaleBitmap,
-                    image: `${bitmapsAtlasFileName}.png`,
+                    image: `${bitmapsAtlasFileName}.png?v=${atlas.hash}`,
                     size: {
                         w: atlas.rootNode.rect.w,
                         h: atlas.rootNode.rect.h
@@ -186,3 +197,4 @@ export class Spritesheet {
     }
 
 }
+

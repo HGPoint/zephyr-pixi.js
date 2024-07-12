@@ -125,12 +125,14 @@ class Atlas {
   private _terminalNodes: { [index: string]: AtlasNode };
   private _uvs: UvIndex | null | undefined;
   private _uvs2: UvIndex2 | null | undefined;
+  public hash: string;
 
   constructor(canvas: HTMLCanvasElement, options: AtlasOptions = {}) {
     this.tilepad = options.tilepad || false;
     this.margin = options.margin || 0;
 
     this.canvas = canvas;
+    this.hash = '';
 
     //@ts-ignore
     this.context = canvas.getContext('2d', { willReadFrequently: true });
