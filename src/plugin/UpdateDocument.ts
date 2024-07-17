@@ -63,9 +63,9 @@ function getAllMainComponentIdsFrom(container: BaseContainer): string[] {
 //let _loaded = false;
 export async function updateDocument(load:boolean = true, target = "", filter:string[] = [], isExport = false) {
 
-    // if(_loaded && target){
-    //     return;
-    // }
+    if(target){
+        return;
+    }
 
     const currentDocument = new BaseDocument(figma.root);
 

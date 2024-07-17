@@ -22,7 +22,7 @@ async function main() {
             {
               const data:{target:string|undefined;filteredIds:string[]|undefined} = message.data;
               if(data.target){
-                await updateDocument(false, data.target);
+                //await updateDocument(false, data.target);
                 figma.ui.postMessage({type: "targetView", data: {
                     document: BaseDocument.current,
                     target: data.target

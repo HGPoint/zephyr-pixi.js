@@ -263,6 +263,7 @@ function TreeSectorsNode({ node }:{node:any}) {
   checked = DocumentFilter.instance.getSelectedById(id);
 
   const handleClick = () => {
+    Logger.log(`NODE ${node.name}`, node);
     setShowChildren(!showChildren);
   };
 
@@ -324,13 +325,26 @@ export class DocumentTree extends React.Component {
             });
         }
 
-      this.setState({
-        counter: ++this.state.counter,
-        figmaData: figmaData
-      });
+        this.setState({
+          counter: ++this.state.counter,
+          figmaData: {
+            components:{
+              _components:[],
+              _componentSets:[]
+            },
+            _children:[],
+            _images:[],
+            atlases:[]
+          }
+        });
+        
+        this.setState({
+          counter: ++this.state.counter,
+          figmaData: figmaData
+        });
 
-      setNavigationBarCount(DocumentFilter.instance.selectedCount, this.state.figmaData._children.length);
-    };
+        setNavigationBarCount(DocumentFilter.instance.selectedCount, this.state.figmaData._children.length);
+      };
 
     return (
       <div className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">

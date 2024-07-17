@@ -107,7 +107,7 @@ const App = (props:any) => {
             break;
         case "currentPage":
           {
-            //console.log("currentPage", data);
+            Logger.log("currentPage", data);
 
             updateTree(data.document);
             const message = JSON.stringify({
