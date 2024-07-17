@@ -6,21 +6,25 @@ import { DocumentSpritesheets } from "./DocumentSpritesheets";
 import { openLoadingDialog } from './LoadingDialog';
 import { delay } from '../plugin/Utils/utils';
 import { openSettingsDialog } from './SettingsDialog';
+import {DocumentFilter} from "./DocumentFilter";
+import {Logger} from "../common/Logger";
 
 let _url = "";
 let _count:number = 0;
+let _selectedCount:number = 0;
 
 let _setNavigationBar: (url:string) => void;
-let _setNavigationBarData: (count:number) => void;
+let _setNavigationBarData: (selectedCount: number, count:number) => void;
 
 export function setNavigationBar(url:string){
     _url = url;
     _setNavigationBar && _setNavigationBar(url);
 }
 
-export function setNavigationBarCount(count:number){
+export function setNavigationBarCount(selectedCount: number, count:number){
+    _selectedCount = selectedCount;
     _count = count;
-    _setNavigationBarData && _setNavigationBarData(count);
+    _setNavigationBarData && _setNavigationBarData(selectedCount, count);
 }
 
 export class NavigationBar extends React.Component {
@@ -28,9 +32,11 @@ export class NavigationBar extends React.Component {
     state:{
         url: string;
         count: number;
+        selectedCount: number,
     } = {
         url:"",
-        count: _count
+        count: _count,
+        selectedCount: _selectedCount,
     };
 
     render() {
@@ -41,22 +47,35 @@ export class NavigationBar extends React.Component {
             });
         };
 
-        _setNavigationBarData = (count:number) => {
-            this.setState({ 
-                count: count
+        _setNavigationBarData = (selectedCount: number, count:number) => {
+            this.setState({
+                selectedCount: selectedCount,
+                count: count,
             });
         };
 
         const onExport = async () => {
+            if(!this.state.selectedCount){
+                return;
+            }
             openLoadingDialog();
             await delay(200);
-            parent.postMessage({ pluginMessage: { type: "export" } }, "*");
+            parent.postMessage({ pluginMessage: { type: "export", data: { filteredIds: DocumentFilter.instance.getSelectedIds()} } }, "*");
+        };
+
+        const onExportAll = async () => {
+            openLoadingDialog();
+            await delay(200);
+            parent.postMessage({ pluginMessage: { type: "exportAll" } }, "*");
         };
         
         const onApply = async () => {
+            if(!this.state.selectedCount){
+                return;
+            }
             openLoadingDialog();
             await delay(200);
-            parent.postMessage({ pluginMessage: { type: "apply", data: { } } }, "*");
+            parent.postMessage({ pluginMessage: { type: "apply", data: { filteredIds: DocumentFilter.instance.getSelectedIds()} } }, "*");
         };
         
         const onGo = () => {
@@ -89,10 +108,14 @@ export class NavigationBar extends React.Component {
                     </div>
                     <div className="flex-none">
                     <div className="indicator">
-                        <span className="indicator-item badge">{this.state.count}</span> 
+                        <span className="indicator-item badge">{this.state.selectedCount}/{this.state.count}</span>
                         <button className="btn btn-sm mx-0.5" onClick={onApply}>Apply</button>
                     </div>
-                    <button className="btn btn-sm mx-5" onClick={onExport}>Export...</button>
+                    <div className="indicator mx-7">
+                        <span className="indicator-item badge badge-secondary">{this.state.selectedCount}</span>
+                        <button className="btn btn-sm" onClick={onExport}>Export spritesheets...</button>
+                    </div>
+                    <button className="btn btn-sm" onClick={onExportAll}>Export all...</button>
                     <button className="btn btn-sm btn-square btn-ghost mx-0.5" onClick={onSettings}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
                     </button>

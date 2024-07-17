@@ -1,9 +1,6 @@
 Logger.log("start");
 
-import { BaseContainer } from "./Nodes/BaseNodeContainer";
 import { BaseDocument } from "./Page/BaseDocument";
-import { RectangleNodeContainer } from "./Nodes/RectangleNodeContainer";
-import { IClientStorageData } from "../common/IClientStorageData";
 import { exportDocument } from "./export";
 import { clientStorageData, loadClientStorageData, saveClientStorageData } from "./ClientStorageData";
 import { updateDocument } from "./UpdateDocument";
@@ -23,7 +20,7 @@ async function main() {
         switch(message.type){
           case "apply":
             {
-              const data:{target:string|undefined} = message.data;
+              const data:{target:string|undefined;filteredIds:string[]|undefined} = message.data;
               if(data.target){
                 await updateDocument(false, data.target);
                 figma.ui.postMessage({type: "targetView", data: {
@@ -32,7 +29,7 @@ async function main() {
                   } 
                 }, { origin: "*" });
               } else {
-                await updateDocument(true);
+                await updateDocument(true, "", data.filteredIds || []);
                 figma.ui.postMessage({type: "currentPage", data: {
                     document: BaseDocument.current
                   } 
@@ -56,7 +53,16 @@ async function main() {
             saveClientStorageData();
             break;
           case "export":{
-            await exportDocument();
+            Logger.log("export", message);
+            const data:{filteredIds:string[]|undefined} = message.data;
+            await updateDocument(true, "", data.filteredIds || []);
+            await exportDocument(false);
+            break;
+          }
+          case "exportAll":{
+            Logger.log("exportAll", message);
+            await updateDocument(true, "", [], true);
+            await exportDocument(true);
             break;
           }
         }

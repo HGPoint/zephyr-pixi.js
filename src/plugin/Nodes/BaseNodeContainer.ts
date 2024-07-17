@@ -66,6 +66,13 @@ export interface IRectangleNodeProp extends IDefaultNode {
     cornerRadius: number;
 }
 
+export interface IVectorNodeProp extends IDefaultNode {
+    vectorPaths: {
+        windingRule: 'NONZERO' | 'EVENODD'| 'NONE';
+        data: string;
+    }[];
+}
+
 export interface ITextNodeProp extends IDefaultNode {
     textAlignHorizontal: 'LEFT' | 'CENTER' | 'RIGHT' | 'JUSTIFIED';
     textAlignVertical: 'TOP' | 'CENTER' | 'BOTTOM';
@@ -113,9 +120,11 @@ export class BaseContainer implements IBaseNode {
     public x = 0;
     public y = 0;
 
-    public properties: IRectangleNodeProp | ITextNodeProp | IBaseFrameNodeProp | IInstanceNodeProp | null = null;
+    public properties: IVectorNodeProp | IRectangleNodeProp | ITextNodeProp | IBaseFrameNodeProp | IInstanceNodeProp | null = null;
 
-    constructor(node: SceneNode) {
+    public isEmpty = false;
+
+    constructor(node: SceneNode, isEmpty = false) {
         //@ts-ignore
         this.type = node.type;
         this.id = node.id;
@@ -125,6 +134,12 @@ export class BaseContainer implements IBaseNode {
         this.width = node.width;
         this.x = node.x;
         this.y = node.y;
+        this.isEmpty = isEmpty;
+
+        if(isEmpty){
+            this.type = "";
+            return;
+        }
 
         if(node.type == "FRAME"){
             this.properties = {
@@ -235,6 +250,15 @@ export class BaseContainer implements IBaseNode {
                 layoutSizingVertical: node.layoutSizingVertical,
                 constraints: node.constraints,
             } as IRectangleNodeProp;
+        } else if(node.type == "VECTOR"){
+            this.properties = {
+                vectorPaths: node.vectorPaths.map(v => { 
+                    return {
+                        windingRule: v.windingRule,
+                        data: v.data
+                    }
+                })
+            } as IVectorNodeProp;
         }
 
         if(this.properties){

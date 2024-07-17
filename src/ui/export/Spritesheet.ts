@@ -93,6 +93,11 @@ export class Spritesheet {
             for (let i = bitmaps.length - 1; i >= 0; i--) {
                 const bitmap = bitmaps[i];
 
+                if(!bitmap.src){
+                    bitmaps.splice(i, 1);
+                    continue;
+                }
+
                 const image = await this.loadImage(`${bitmap.src}`) as HTMLImageElement;
 
                 const id = bitmap.name;

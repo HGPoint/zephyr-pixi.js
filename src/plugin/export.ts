@@ -26,7 +26,7 @@ export interface IExportableResources {
 //     return bufView;
 // }
   
-export async function exportDocument() {
+export async function exportDocument(isAllData:boolean) {
 
     const nodes:Array<SceneNode> = [];
 
@@ -86,9 +86,15 @@ export async function exportDocument() {
     //     setting : { format: "JSON", suffix: "" },
     //     bytes: uint8array,
     // });
-    
-    figma.ui.postMessage({type: "export", data: {
-        resources: exportableResources,
-        document: BaseDocument.current
-    }});
+    if(isAllData){
+        figma.ui.postMessage({type: "exportAll", data: {
+            resources: exportableResources,
+            document: BaseDocument.current
+        }});
+    } else {
+        figma.ui.postMessage({type: "export", data: {
+            resources: exportableResources,
+            document: BaseDocument.current
+        }});
+    }
 }

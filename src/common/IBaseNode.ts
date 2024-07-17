@@ -1,4 +1,4 @@
-import { IBaseFrameNodeProp, IInstanceNodeProp, IRectangleNodeProp, ITextNodeProp } from "../plugin/Nodes/BaseNodeContainer";
+import { IBaseFrameNodeProp, IInstanceNodeProp, IRectangleNodeProp, ITextNodeProp, IVectorNodeProp } from "../plugin/Nodes/BaseNodeContainer";
 
 export interface IBaseNode {
     type: 
@@ -14,7 +14,7 @@ export interface IBaseNode {
     x:number;
     y:number;
 
-    properties: IRectangleNodeProp | ITextNodeProp | IBaseFrameNodeProp | IInstanceNodeProp | null;
+    properties: IVectorNodeProp | IRectangleNodeProp | ITextNodeProp | IBaseFrameNodeProp | IInstanceNodeProp | null;
 
     _children:Array<IBaseNode>;
 }
@@ -28,4 +28,9 @@ export interface IBaseInstanceNode extends IBaseNode {
 export interface IBaseRectangleNode extends IBaseNode {
     type: 'RECTANGLE';
     properties: IRectangleNodeProp;
+}
+
+export interface IBaseVectorNode extends IBaseNode {
+    type: 'VECTOR';
+    properties: IVectorNodeProp;
 }

@@ -29,28 +29,28 @@ function exportTypeToFileExtension(type: string) {
   }
 }
 
-export async function exportData (data:any, figmaDocument:IBaseDocument) {
+export async function exportData (data:any, figmaDocument:IBaseDocument, isAllData:boolean) {
 
   const exportableBytes = data;
 
-  const atlases = await DocumentSpritesheets.build(figmaDocument);
+  const atlases = await DocumentSpritesheets.build(figmaDocument, isAllData);
 
   return new Promise<void>(resolve => {
     let zip = new JSZip();
     let fileName = "export";
     
-    const imagesFolder = zip.folder("images");
-    for (let data of exportableBytes) {
-      const { bytes, name, setting, id } = data
-      const cleanBytes = typedArrayToBuffer(bytes)
-      const type = exportTypeToBlobType(setting.format);
-      if(setting.format == "JSON"){
-        fileName = name;
-      }
-      const extension = exportTypeToFileExtension(setting.format)
-      let blob = new Blob([ cleanBytes ], { type })
-      imagesFolder.file(`${id.split(":").join("_")}${setting.suffix}${extension}`, blob, {base64: true});
-    }
+    // const imagesFolder = zip.folder("images");
+    // for (let data of exportableBytes) {
+    //   const { bytes, name, setting, id } = data
+    //   const cleanBytes = typedArrayToBuffer(bytes)
+    //   const type = exportTypeToBlobType(setting.format);
+    //   if(setting.format == "JSON"){
+    //     fileName = name;
+    //   }
+    //   const extension = exportTypeToFileExtension(setting.format)
+    //   let blob = new Blob([ cleanBytes ], { type })
+    //   imagesFolder.file(`${id.split(":").join("_")}${setting.suffix}${extension}`, blob, {base64: true});
+    // }
 
     for (let atlas of atlases) {
       if(!atlas){
@@ -79,7 +79,9 @@ export async function exportData (data:any, figmaDocument:IBaseDocument) {
       image._bytes = "";
     });
     figmaDocument.atlases = atlases.filter(a => !!a).map(a => a?.name ? a.name:'');
-    zip.file(`figma.json`, JSON.stringify(figmaDocument));
+    if(isAllData){
+      zip.file(`figma.json`, JSON.stringify(figmaDocument));
+    }
 
     zip.generateAsync({ type: 'blob' })
       .then((content: Blob) => {

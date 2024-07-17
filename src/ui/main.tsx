@@ -8,12 +8,15 @@ import { DocumentTree, ImageDialog, SpritesheetDialog, updateTree } from './Docu
 import { LoadingDialog, completeLoadingDialog, openLoadingDialog, setProgressLoadingDialog } from './LoadingDialog';
 import { SettingsDialog, openSettingsDialog, setSettingsWindowSize } from './SettingsDialog';
 import { NavigationBar, setNavigationBar } from './NavigationBar';
+import { Logger } from '../common/Logger';
 
 declare function require(path: string): any;
 
+Logger.setSource("UI");
+
 const App = (props:any) => {
 
-  console.log("App start");
+  Logger.log("App start");
   let loaded = false; 
   let messages = [];
   window.onmessage = (e) => onDocumentChange(e.data.pluginMessage);
@@ -38,7 +41,7 @@ const App = (props:any) => {
       switch(newMessages.type){
         case "clientStorageData":
           {
-            console.log("UI : Client Storage Data", data);
+            Logger.log("Client Storage Data", data);
             clientStorageData = data;
             // if(inputUrlRef.current){
             //   //inputUrlRef.current.value = clientStorageData.url;
@@ -57,7 +60,16 @@ const App = (props:any) => {
           break;
         case "export":
           {
-            const result = await exportData(data.resources, data.document);
+            Logger.log("export", data);
+            const result = await exportData(data.resources, data.document, false);
+            
+            completeLoadingDialog();
+          }
+          break;
+        case "exportAll":
+          {
+            Logger.log("exportAll", data);
+            const result = await exportData(data.resources, data.document, true);
             
             completeLoadingDialog();
           }
@@ -163,10 +175,7 @@ const App = (props:any) => {
         </div> 
         <div className="drawer-side z-40">
           <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
-          <div className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-            <img src={require("./images/figma_to_pixijs_logo_sm.png")}/>
-            <DocumentTree/>
-          </div>
+          <DocumentTree/>
         </div>
       </div>
     </div>

@@ -110,7 +110,7 @@ export class DocumentSpritesheets {
         return [];
     }
 
-    public static async build(data:IBaseDocument){
+    public static async build(data:IBaseDocument, isAllData:boolean){
 
         const nodeResourcesIds:Array<{
             key:string;
@@ -120,6 +120,9 @@ export class DocumentSpritesheets {
         }> = [];
 
         data._children.forEach((node:IBaseNode) => {
+            if(!node.type){
+                return;
+            }
             nodeResourcesIds.push({
                 key: node.id.split(":").join("_"),
                 id: node.id,
@@ -137,28 +140,31 @@ export class DocumentSpritesheets {
 
         let matchResourcesIds:string[] = [];
 
-        let match_i = 0;
-        for (let i = 0; i < nodeResourcesIds.length; i++) {
-            const array1 = nodeResourcesIds[i].data;
-            //console.log("array:", array1);
-            for (let j = match_i++; j < nodeResourcesIds.length; j++) {
-                if(i == j) continue;
-                const array2 = nodeResourcesIds[j].data;
-                matchResourcesIds = this.arrayUnique(matchResourcesIds.concat(this.arrayMatch(array1, array2)));
-            }
-        }
-
-        //console.log("match:", matchResourcesIds);
-
-        for (let i = 0; i < nodeResourcesIds.length; i++) {
-            const array1 = nodeResourcesIds[i].data;
-            nodeResourcesIds[i].data = array1.filter((el) => !matchResourcesIds.includes(el));
-            //console.log("array:", nodeResourcesIds[i].data);
-        }
-
         const atlases = [];
 
-        atlases.push(...await this.buildAtlas(2048, data, matchResourcesIds, "common", false));
+        if(isAllData){
+            let match_i = 0;
+            for (let i = 0; i < nodeResourcesIds.length; i++) {
+                const array1 = nodeResourcesIds[i].data;
+                //console.log("array:", array1);
+                for (let j = match_i++; j < nodeResourcesIds.length; j++) {
+                    if(i == j) continue;
+                    const array2 = nodeResourcesIds[j].data;
+                    matchResourcesIds = this.arrayUnique(matchResourcesIds.concat(this.arrayMatch(array1, array2)));
+                }
+            }
+
+            //console.log("match:", matchResourcesIds);
+
+            for (let i = 0; i < nodeResourcesIds.length; i++) {
+                const array1 = nodeResourcesIds[i].data;
+                nodeResourcesIds[i].data = array1.filter((el) => !matchResourcesIds.includes(el));
+                //console.log("array:", nodeResourcesIds[i].data);
+            }
+
+
+            atlases.push(...await this.buildAtlas(2048, data, matchResourcesIds, "common", false));
+        }
 
         for (let i = 0; i < nodeResourcesIds.length; i++) {
             const atlas = await this.buildAtlas(48, data, nodeResourcesIds[i].data, nodeResourcesIds[i].key);
