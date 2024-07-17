@@ -47,19 +47,6 @@ function build(node:SceneNode, container: BaseContainer){
 
 }
 
-function getAllMainComponentIdsFrom(container: BaseContainer): string[] {
-    const result: string[] = [];
-    container._children.forEach(item => {
-        if (item.type === 'INSTANCE') {
-            const id = (item.properties as IInstanceNodeProp).mainComponent;
-            id && result.push(id);
-        } else {
-            result.push(...getAllMainComponentIdsFrom(item));
-        }
-    })
-    return result;
-}
-
 //let _loaded = false;
 export async function updateDocument(load:boolean = true, target = "", filter:string[] = [], isExport = false) {
 
@@ -99,8 +86,7 @@ export async function updateDocument(load:boolean = true, target = "", filter:st
             build(child, container);
         
             BaseDocument.current.addChild(container);
-
-            componentIdsToLoad.push(...getAllMainComponentIdsFrom(container));
+            
         } else {
             const container = new BaseContainer(child, true);
         
@@ -121,7 +107,7 @@ export async function updateDocument(load:boolean = true, target = "", filter:st
 
     loadProgress(0, `LOADING....NODES DONE`);
     await delay(50);
-    await currentDocument.load(componentIdsToLoad);
+    await currentDocument.load();
 
     Logger.log("UpdateDocument", BaseDocument.current);
 }

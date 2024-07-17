@@ -64,33 +64,24 @@ export class BaseDocument implements IBaseDocument {
         this._images.push(new ImageRes(hash));
     }
 
-    public async load(filteredIds: string[]){
+    public async load(){
 
         let componentContentLoad = componentContentLoadQueue.peek();
         let start = componentContentLoadQueue.length;
 
-        Logger.log(`filteredIds: `, filteredIds);
-        
         while(componentContentLoad){
             let progress = (1-componentContentLoadQueue.length/start);
-            if (filteredIds.includes(componentContentLoad.componentContent.id)) {
-                try{
+            try{
 
-                    loadProgress(progress, `LOADING....COMPONENTS ${componentContentLoad.componentContent.name}`);
+                loadProgress(progress, `LOADING....COMPONENTS ${componentContentLoad.componentContent.name}`);
 
-                    //Logger.log("LOADING....COMPONENTS", componentContentLoad.componentContent.name);
+                //Logger.log("LOADING....COMPONENTS", componentContentLoad.componentContent.name);
 
-                    await componentContentLoad.componentContent.render(componentContentLoad.node);
-                } catch (error) {
-                    Logger.log("LOADING....COMPONENTS - ERROR", error);
+                await componentContentLoad.componentContent.render(componentContentLoad.node);
+            } catch (error) {
+                Logger.log("LOADING....COMPONENTS - ERROR", error);
 
-                    loadProgress(progress, `LOADING....COMPONENTS - ERROR! ${componentContentLoad.componentContent.name}`);
-                }
-
-            } else {
-
-                loadProgress(progress, `LOADING....COMPONENTS - IGNORE ${componentContentLoad.componentContent.name}`);
-                
+                loadProgress(progress, `LOADING....COMPONENTS - ERROR! ${componentContentLoad.componentContent.name}`);
             }
             componentContentLoadQueue.dequeue();
             componentContentLoad = componentContentLoadQueue.peek();
