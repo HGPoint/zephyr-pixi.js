@@ -68,6 +68,12 @@ export class NavigationBar extends React.Component {
             await delay(200);
             parent.postMessage({ pluginMessage: { type: "exportAll" } }, "*");
         };
+
+        const onExportFigma = async () => {
+            openLoadingDialog();
+            await delay(200);
+            parent.postMessage({ pluginMessage: { type: "exportFigma" } }, "*");
+        };
         
         const onApply = async () => {
             if(!this.state.selectedCount){
@@ -113,9 +119,17 @@ export class NavigationBar extends React.Component {
                     </div>
                     <div className="indicator mx-7">
                         <span className="indicator-item badge badge-secondary">{this.state.selectedCount}</span>
-                        <button className="btn btn-sm" onClick={onExport}>Export spritesheets...</button>
+                        <button className="btn btn-sm" onClick={onExport}>Export selected...</button>
                     </div>
-                    <button className="btn btn-sm" onClick={onExportAll}>Export all...</button>
+                    <div className="dropdown dropdown-bottom dropdown-end">
+                        <label {...{tabIndex: 1}} className="btn btn-sm btn-outline btn-accent">Export</label>
+                        <ul {...{tabIndex: 1}} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                            <li><a onClick={onExportAll}>Export all...</a></li>
+                            <li><a className="btn-disabled">Export figma.json</a></li>
+                            {/* <li><a onClick={onExportFigma}>Export figma.json</a></li> */}
+                        </ul>
+                    </div>
+                    {/* <button className="btn btn-sm btn-outline btn-accent" onClick={onExportAll}>Export all...</button> */}
                     <button className="btn btn-sm btn-square btn-ghost mx-0.5" onClick={onSettings}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
                     </button>

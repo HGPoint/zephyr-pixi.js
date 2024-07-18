@@ -61,7 +61,7 @@ const App = (props:any) => {
         case "export":
           {
             Logger.log("export", data);
-            const result = await exportData(data.resources, data.document, false);
+            const result = await exportData(data.resources, data.document, "export");
             
             completeLoadingDialog();
           }
@@ -69,7 +69,15 @@ const App = (props:any) => {
         case "exportAll":
           {
             Logger.log("exportAll", data);
-            const result = await exportData(data.resources, data.document, true);
+            const result = await exportData(data.resources, data.document, "exportAll");
+            
+            completeLoadingDialog();
+          }
+          break;
+        case "exportFigma":
+          {
+            Logger.log("exportAll", data);
+            const result = await exportData(data.resources, data.document, "exportFigma");
             
             completeLoadingDialog();
           }

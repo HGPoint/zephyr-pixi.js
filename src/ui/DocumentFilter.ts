@@ -73,6 +73,18 @@ export class DocumentFilter
         return this._items[id].selected ?? false;
     }
 
+    private _search = "";
+    public search(name: string) {
+        this._search = name;
+    }
+
+    public getVisibleByName(name: string): boolean {
+        if(!this._search){
+            return true;
+        }
+        return name.indexOf(this._search) >= 0;
+    }
+
     public setSelectedById(id: string, selected: boolean): void {
         if (this._items[id] && this._items[id].selected !== selected) {
             this._items[id].selected = selected;

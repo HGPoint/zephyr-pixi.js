@@ -1,5 +1,7 @@
 import { IBaseDocument } from "../common/IBaseDocument";
 import { IBaseInstanceNode, IBaseNode } from "../common/IBaseNode";
+import { delay } from "../plugin/Utils/utils";
+import { setProgressLoadingDialog } from "./LoadingDialog";
 import { Spritesheet } from "./export/Spritesheet";
 
 export class DocumentSpritesheets {
@@ -162,11 +164,17 @@ export class DocumentSpritesheets {
                 //console.log("array:", nodeResourcesIds[i].data);
             }
 
-
+            setProgressLoadingDialog(0, `BUILD SPRITESHEET - common`);
+            await delay(50);
+            
             atlases.push(...await this.buildAtlas(2048, data, matchResourcesIds, "common", false));
         }
 
         for (let i = 0; i < nodeResourcesIds.length; i++) {
+            
+            setProgressLoadingDialog(i/nodeResourcesIds.length, `BUILD SPRITESHEET - ${nodeResourcesIds[i].key}`);
+            await delay(50);
+
             const atlas = await this.buildAtlas(48, data, nodeResourcesIds[i].data, nodeResourcesIds[i].key);
             if(atlas){
                 //@ts-ignore

@@ -260,7 +260,9 @@ function TreeSectorsNode({ node }:{node:any}) {
 
   const [showChildren, setShowChildren] = React.useState(false);
   let [checked, setChecked] = React.useState(DocumentFilter.instance.getSelectedById(id));
+  let [visible, setVisible] = React.useState(DocumentFilter.instance.getVisibleByName(name));
   checked = DocumentFilter.instance.getSelectedById(id);
+  visible = DocumentFilter.instance.getVisibleByName(name);
 
   const handleClick = () => {
     Logger.log(`NODE ${node.name}`, node);
@@ -273,7 +275,7 @@ function TreeSectorsNode({ node }:{node:any}) {
   }
 
   return (
-    <li>
+    <li style={{display: visible ? 'flex' : 'none' }}>
         
       <details open={false}>
         <summary onClick={handleClick} ><input onChange={handleChange} checked={checked} type="checkbox" className="checkbox checkbox-xs"/><img width={24} height={24} className="w-4 h-4" src={require("./icons/folder.svg")}/> {name} </summary>
@@ -295,6 +297,7 @@ export class DocumentTree extends React.Component {
     counter: 0,
     figmaData: _figmaData,
     allSelected: false,
+    search: "",
   };
 
   render() {
@@ -350,7 +353,7 @@ export class DocumentTree extends React.Component {
       <div className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
         <img src={require("./images/figma_to_pixijs_logo_sm.png")}/>
         <div className="form-control w-full max-w-xs py-2">
-          <input type="text" placeholder="filter" className="input input-sm w-full max-w-xs" />
+          <input  value={this.state.search} onChange={(e) => { DocumentFilter.instance.search(e.target.value); this.setState({search: e.target.value});  }}  type="text" placeholder="filter" className="input input-sm w-full max-w-xs" />
         </div>
         <ul className="menu menu-xs bg-base-200 rounded-lg max-w-xs w-full">
           <li><a> <img width={24} height={24} className="w-4 h-4" src={require("./icons/pdf.svg")}/> readme.txt </a></li>
