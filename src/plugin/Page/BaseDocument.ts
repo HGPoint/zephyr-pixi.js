@@ -31,6 +31,7 @@ export class BaseDocument implements IBaseDocument {
 
     public name: string = "";
     public id: string = "";
+    public _defaults: { [key: string]: any; } = {};
 
     constructor(node: DocumentNode) {
 

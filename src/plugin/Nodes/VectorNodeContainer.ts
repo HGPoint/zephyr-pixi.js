@@ -11,15 +11,15 @@ export class VectorPath {
 
 export class VectorNodeContainer extends BaseContainer {
 
-    private _fill: Array<ImagePaintContainer | SolidPaintContainer | GradientPaintContainer> = [];
-    public get fill() {
-        return this._fill;
-    }
+    // private _fill: Array<ImagePaintContainer | SolidPaintContainer | GradientPaintContainer> = [];
+    // public get fill() {
+    //     return this._fill;
+    // }
     
-    private _fillGeometry: Array<VectorPath> = [];
-    public get fillGeometry() {
-        return this._fillGeometry;
-    }
+    // private _fillGeometry: Array<VectorPath> = [];
+    // public get fillGeometry() {
+    //     return this._fillGeometry;
+    // }
 
     constructor(node: VectorNode) {
         super(node);
@@ -53,7 +53,7 @@ export class VectorNodeContainer extends BaseContainer {
         // this._fillGeometry = node.fillGeometry.map(g => new VectorPath(g.data, g.windingRule));
 
     }
-    
+
 }
 
 

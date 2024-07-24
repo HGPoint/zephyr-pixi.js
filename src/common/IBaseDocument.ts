@@ -10,4 +10,7 @@ export interface IBaseDocument {
     _children: Array<IBaseNode>;
     _images:Array<any>;
     atlases: string[];
+    _defaults: {
+        [key: string] : any;
+    }
 }

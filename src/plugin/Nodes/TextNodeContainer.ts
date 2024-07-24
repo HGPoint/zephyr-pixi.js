@@ -86,7 +86,7 @@ export class TextNodeContainer extends BaseContainer {
         }
 
         if(node.fillGeometry){
-            this.fillGeometry = node.fillGeometry.map(g => new VectorPath(g.data, g.windingRule));
+            //this.fillGeometry = node.fillGeometry.map(g => new VectorPath(g.data, g.windingRule));
         }
 
     }

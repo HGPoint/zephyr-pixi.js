@@ -125,8 +125,8 @@ export class NavigationBar extends React.Component {
                         <label {...{tabIndex: 1}} className="btn btn-sm btn-outline btn-accent">Export</label>
                         <ul {...{tabIndex: 1}} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
                             <li><a onClick={onExportAll}>Export all...</a></li>
-                            <li><a className="btn-disabled">Export figma.json</a></li>
-                            {/* <li><a onClick={onExportFigma}>Export figma.json</a></li> */}
+                            <li><a className="btn-disabled">Export root.figma</a></li>
+                            {/* <li><a onClick={onExportFigma}>Export root.figma</a></li> */}
                         </ul>
                     </div>
                     {/* <button className="btn btn-sm btn-outline btn-accent" onClick={onExportAll}>Export all...</button> */}

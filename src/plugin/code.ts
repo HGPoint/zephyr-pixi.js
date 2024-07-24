@@ -56,13 +56,19 @@ async function main() {
             Logger.log("export", message);
             const data:{filteredIds:string[]|undefined} = message.data;
             await updateDocument(true, "", data.filteredIds || []);
-            await exportDocument(false);
+            await exportDocument("export");
             break;
           }
           case "exportAll":{
             Logger.log("exportAll", message);
             await updateDocument(true, "", [], true);
-            await exportDocument(true);
+            await exportDocument("exportAll");
+            break;
+          }
+          case "exportFigma":{
+            Logger.log("exportFigma", message);
+            await updateDocument(true, "", [], true, true);
+            await exportDocument("exportFigma");
             break;
           }
         }

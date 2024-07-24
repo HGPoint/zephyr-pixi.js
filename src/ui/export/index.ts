@@ -40,8 +40,8 @@ const RECTANGLE_DEFAULT_VALUES = {
     "layoutSizingHorizontal": "FIXED",
     "layoutSizingVertical": "FIXED",
     "constraints": {
-      "horizontal": "MIN",
-      "vertical": "MIN"
+      "horizontal": "STRETCH",
+      "vertical": "STRETCH"
     },
     "minWidth": null,
     "minHeight": null,
@@ -69,8 +69,8 @@ const FRAME_DEFAULT_VALUES = {
     "primaryAxisAlignItems": "MIN",
     "counterAxisAlignItems": "MIN",
     "constraints": {
-      "horizontal": "MIN",
-      "vertical": "MIN"
+      "horizontal": "STRETCH",
+      "vertical": "STRETCH"
     },
     "layoutPositioning": "AUTO",
     "layoutSizingHorizontal": "FIXED",
@@ -170,15 +170,15 @@ function removeDefaultValues(children: Array<IBaseNode>){
 
     switch(child.type) {
       case "RECTANGLE":{
-        //removeDefault(child, RECTANGLE_DEFAULT_VALUES);
+        removeDefault(child, RECTANGLE_DEFAULT_VALUES);
         break;
       }
       case "FRAME":{
-        //removeDefault(child,FRAME_DEFAULT_VALUES);
+        removeDefault(child,FRAME_DEFAULT_VALUES);
         break;
       }
       case "VECTOR":{
-        //removeDefault(child, VECTOR_DEFAULT_VALUES);
+        removeDefault(child, VECTOR_DEFAULT_VALUES);
         break;
       }
       case "":{
@@ -186,6 +186,7 @@ function removeDefaultValues(children: Array<IBaseNode>){
         break;
       }
       case "INSTANCE":{
+        removeDefault(child,FRAME_DEFAULT_VALUES);
         //console.log("INSTANCE", child._children);
         //child._children = [];
         break;
@@ -216,10 +217,36 @@ export async function exportData (data:any, figmaDocument:IBaseDocument, exportA
       });
 
       figmaDocument._images = [];
+
+      for (let index = figmaDocument._children.length-1; index >= 0; index--) {
+        const child = figmaDocument._children[index];
+        
+        const childId = child.id.split(":").join("_");
+        //@ts-ignore
+        figmaDocument._children[index] = `${childId}.figma.json`;
+        figmaDocument._defaults = {
+          "RECTANGLE": RECTANGLE_DEFAULT_VALUES,
+          "FRAME": FRAME_DEFAULT_VALUES,
+          "VECTOR": VECTOR_DEFAULT_VALUES,
+          "INSTANCE": FRAME_DEFAULT_VALUES,
+        };
+        // figmaDocument._children[index] = {
+        //     id: child.id,
+        //     type: child.type,
+        //     name: child.name,
+        //     _children: [],
+        //     visible: child.visible,
+        //     x: child.x,
+        //     y: child.y,
+        //     width: child.width,
+        //     height: child.height,
+        //     properties: child.properties
+        //   }
+      }
       
       removeDefaultValues(figmaDocument._children);
 
-      const str = JSON.stringify(figmaDocument);
+      const str = JSON.stringify(figmaDocument, null, "\t");
       const bytes = new TextEncoder().encode(str);
       const content = new Blob([bytes], {
           type: "application/json;charset=utf-8"
@@ -286,11 +313,31 @@ export async function exportData (data:any, figmaDocument:IBaseDocument, exportA
     figmaDocument.atlases = atlases.filter(a => !!a).map(a => a?.name ? a.name:'');
     
     figmaDocument._images = [];
+    figmaDocument._defaults = {
+      "RECTANGLE": RECTANGLE_DEFAULT_VALUES,
+      "FRAME": FRAME_DEFAULT_VALUES,
+      "VECTOR": VECTOR_DEFAULT_VALUES,
+      "INSTANCE": FRAME_DEFAULT_VALUES,
+    };
       
     removeDefaultValues(figmaDocument._children);
 
+    for (let index = figmaDocument._children.length-1; index >= 0; index--) {
+      const child = figmaDocument._children[index];
+
+      if(!child.type){
+        continue;
+      }
+      
+      const childId = child.id.split(":").join("_");
+      zip.file(`${childId}.figma.json`, JSON.stringify(child, null, "\t"));
+
+      //@ts-ignore
+      figmaDocument._children[index] = `${childId}.figma.json`;
+    }
+
     if(exportAs == "exportAll"){
-      zip.file(`figma.json`, JSON.stringify(figmaDocument));
+      zip.file(`root.figma`, JSON.stringify(figmaDocument, null, "\t"));
     }
 
     zip.generateAsync({ type: 'blob' })
