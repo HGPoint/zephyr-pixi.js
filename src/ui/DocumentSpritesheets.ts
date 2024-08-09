@@ -81,6 +81,9 @@ export class DocumentSpritesheets {
             })
         })
         components.filter(c => c.content).forEach((component:any) => {
+            if(component.name.endsWith(".jpg")){
+                return;
+            }
             sprites.includes(component.id) &&
             images.push({
                 src: component.content._bytes,

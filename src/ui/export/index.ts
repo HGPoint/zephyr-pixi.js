@@ -30,6 +30,44 @@ function exportTypeToFileExtension(type: string) {
   }
 }
 
+async function convertBlob(blob:any, type:'image/png'|'image/webp'|'image/jpeg'): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+      let canvas = createTempCanvas();
+      let ctx = canvas.getContext('2d');
+      if(!ctx){ 
+        reject();
+        return;
+      }
+      let image = new Image();
+      image.src = URL.createObjectURL(blob);
+      image.onload = function(){
+          canvas.width = image.width;
+          canvas.height = image.height;
+          ctx && ctx.drawImage(image, 0, 0);
+          let result = dataURItoBlob(canvas.toDataURL(type));
+          resolve(result);
+      }
+  })
+}
+
+function dataURItoBlob(dataURI:string) {
+  var byteString = atob(dataURI.split(',')[1]);
+  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+  var ab = new ArrayBuffer(byteString.length);
+  var ia = new Uint8Array(ab);
+  for (var i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+  }
+  var blob = new Blob([ab], {type: mimeString});
+  return blob;
+}
+
+function createTempCanvas(): HTMLCanvasElement {
+  let canvas = document.createElement('canvas');
+  canvas.style.display = 'none';
+  return canvas;
+}
+
 const RECTANGLE_DEFAULT_VALUES = {
   "isMeta": false,
   "visible": true,
@@ -267,7 +305,7 @@ export async function exportData (data:any, figmaDocument:IBaseDocument, exportA
   
   const atlases = await DocumentSpritesheets.build(figmaDocument, exportAs == "exportAll");
 
-  return new Promise<void>(resolve => {
+  return new Promise<void>(async (resolve, reject) => {
     let zip = new JSZip();
     let fileName = "export";
     
@@ -283,6 +321,23 @@ export async function exportData (data:any, figmaDocument:IBaseDocument, exportA
     //   let blob = new Blob([ cleanBytes ], { type })
     //   imagesFolder.file(`${id.split(":").join("_")}${setting.suffix}${extension}`, blob, {base64: true});
     // }
+
+    for (let data of exportableBytes) {
+      const { bytes, name, setting, id } = data;
+      if(!name.endsWith(".jpg")){
+        continue;
+      }
+      if(setting.format != "PNG"){
+        continue;
+      }
+      console.log("exportableBytes file", name, data);
+      const cleanBytes = typedArrayToBuffer(bytes)
+      const type = exportTypeToBlobType(setting.format);
+      const extension = exportTypeToFileExtension(setting.format)
+      let blob = new Blob([ cleanBytes ], { type });
+      let jpegBlob = await convertBlob(blob, 'image/jpeg');
+      zip.file(`${id.split(":").join("_")}${setting.suffix}${".jpg"}`, jpegBlob, {base64: true});
+    }
 
     for (let atlas of atlases) {
       if(!atlas){
@@ -300,7 +355,12 @@ export async function exportData (data:any, figmaDocument:IBaseDocument, exportA
     }
 
     figmaDocument.components._components.forEach(component => {
-      if(component.content) component.content._bytes = "";
+      if(component.content) {
+        component.content._bytes = "";
+      }
+      if(component.name.endsWith(".jpg")){
+        component.url = `${component.id.split(":").join("_")}${".jpg"}`;
+      }
     }); 
 
     figmaDocument.components._componentSets.forEach(component => {
