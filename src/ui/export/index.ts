@@ -246,6 +246,40 @@ function removeDefaultValues(children: Array<IBaseNode>) {
     }
 }
 
+function sortObject(obj: any): any {
+    if (Array.isArray(obj)) {
+        return obj.map(sortObject);
+    } else if (obj !== null && typeof obj === 'object') {
+        const ordered: any = {};
+
+        // Сначала добавляем ключи id, type, name, если они есть
+        ['id', 'type', 'name'].forEach((key) => {
+            if (key in obj) {
+                ordered[key] = sortObject(obj[key]);
+            }
+        });
+
+        // Собираем остальные ключи, исключая id, type, name и _children
+        const otherKeys = Object.keys(obj).filter(
+            (key) => !['id', 'type', 'name', '_children'].includes(key),
+        );
+
+        // Сортируем остальные ключи в алфавитном порядке и добавляем их
+        otherKeys.sort().forEach((key) => {
+            ordered[key] = sortObject(obj[key]);
+        });
+
+        // Добавляем ключ _children в конец, если он есть
+        if ('_children' in obj) {
+            ordered['_children'] = sortObject(obj['_children']);
+        }
+
+        return ordered;
+    } else {
+        return obj;
+    }
+}
+
 export async function exportData(
     data: any,
     figmaDocument: IBaseDocument,
@@ -296,8 +330,8 @@ export async function exportData(
             }
 
             removeDefaultValues(figmaDocument._children);
-
-            const str = JSON.stringify(figmaDocument, null, '\t');
+            const sortedFigmaDocument = sortObject(figmaDocument);
+            const str = JSON.stringify(sortedFigmaDocument, null, '\t');
             const bytes = new TextEncoder().encode(str);
             const content = new Blob([bytes], {
                 type: 'application/json;charset=utf-8',
@@ -405,7 +439,8 @@ export async function exportData(
             }
 
             const childId = child.id.split(':').join('_');
-            zip.file(`${childId}.figma.json`, JSON.stringify(child, null, '\t'));
+            const sortedChild = sortObject(child);
+            zip.file(`${childId}.figma.json`, JSON.stringify(sortedChild, null, '\t'));
 
             //@ts-ignore
             figmaDocument._children[index] = `${childId}.figma.json`;
