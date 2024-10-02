@@ -1,8 +1,8 @@
-import { BaseDocument } from "../Page/BaseDocument";
+import {BaseDocument} from '../Page/BaseDocument';
 
 export class ImagePaintContainer {
-    readonly type = "ImagePaint";
-    
+    readonly type = 'ImagePaint';
+
     constructor(paint: ImagePaint) {
         this.scaleMode = paint.scaleMode;
         this.imageHash = paint.imageHash as string;
@@ -11,7 +11,7 @@ export class ImagePaintContainer {
     }
 
     scaleMode: 'FILL' | 'FIT' | 'CROP' | 'TILE' = 'FIT';
-    imageHash: string = "";
+    imageHash: string = '';
     imageTransform?: Transform;
     scalingFactor?: number;
     rotation?: number;

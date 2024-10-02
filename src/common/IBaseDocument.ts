@@ -1,4 +1,4 @@
-import { IBaseNode } from "./IBaseNode";
+import {IBaseNode} from './IBaseNode';
 
 export interface IComponentLibraries {
     _components: any[];
@@ -8,9 +8,9 @@ export interface IComponentLibraries {
 export interface IBaseDocument {
     components: IComponentLibraries;
     _children: Array<IBaseNode>;
-    _images:Array<any>;
+    _images: Array<any>;
     atlases: string[];
     _defaults: {
-        [key: string] : any;
-    }
+        [key: string]: any;
+    };
 }

@@ -1,43 +1,44 @@
-import { Logger } from "../common/Logger";
-import { BaseDocument } from "./Page/BaseDocument";
-import { updateDocument } from "./UpdateDocument";
-import { pointsToPath } from "./Utils/utils";
+import {Logger} from '../common/Logger';
 
-let selectionchangeTimer = 0;
+import {pointsToPath} from './Utils/utils';
 
-function documentchange(){
-    
+const selectionchangeTimer = 0;
+
+function documentchange() {
     //selectionchangeTimer && clearTimeout(selectionchangeTimer)
     // selectionchangeTimer = setTimeout(async () => {
     //     await updateDocument();
     //     figma.ui.postMessage({type: "documentchange", data: BaseDocument.current }, { origin: "*" });
     // }, 100);
-    
 }
 
 function documentChangeAsString(change: DocumentChange) {
-    const { origin, type } = change;
-    if(origin == 'REMOTE'){
-      return '';
+    const {origin, type} = change;
+    if (origin == 'REMOTE') {
+        return '';
     }
     //Logger.log("change", change);
     const list: string[] = [origin, type];
-    if (type === "PROPERTY_CHANGE") {
-        Logger.log("change.node", change.node);
-        change.properties.forEach(propertie => {
-            //@ts-ignore
-            list.push(change.node.type, propertie, change.node[`${propertie}`]);
-        });
-    } else if (type === "STYLE_PROPERTY_CHANGE") {
+    if (type === 'PROPERTY_CHANGE') {
         //@ts-ignore
-        list.push(change.style?.name, change.properties.join(", "));
-    } else if (type === "STYLE_CREATE" || type === "STYLE_DELETE") {
+        Logger.log('change.node', change.node);
+        //@ts-ignore
+        change.properties.forEach((property) => {
+            //@ts-ignore
+            list.push(change.node.type, property, change.node[`${property}`]);
+        });
+    } else if (type === 'STYLE_PROPERTY_CHANGE') {
+        //@ts-ignore
+        list.push(change.style?.name, change.properties.join(', '));
+    } else if (type === 'STYLE_CREATE' || type === 'STYLE_DELETE') {
         // noop
     } else {
-        Logger.log("change.node", change.node);
+        //@ts-ignore
+        Logger.log('change.node', change.node);
+        //@ts-ignore
         list.push(change.node.type);
     }
-    return list.join(" ");
+    return list.join(' ');
 }
 
 export function getPolygonBounds(area: number[]) {
@@ -59,11 +60,10 @@ export function getPolygonBounds(area: number[]) {
     return [minX, minY, maxX - minX, maxY - minY];
 }
 
-export function createVector(selection: FrameNode, area: number[], name: string, color: RGB){
-
+export function createVector(selection: FrameNode, area: number[], name: string, color: RGB) {
     const points = [];
-    for (let index = 0; index < area.length; index+=2) {
-        points.push({x: area[index], y: area[index+1]});
+    for (let index = 0; index < area.length; index += 2) {
+        points.push({x: area[index], y: area[index + 1]});
     }
     points.push({x: area[0], y: area[1]});
 
@@ -71,16 +71,16 @@ export function createVector(selection: FrameNode, area: number[], name: string,
     const path = pointsToPath(points);
     const bounds = getPolygonBounds(area);
 
-    vector.vectorPaths = [{ windingRule: 'NONE', data: path}];
-    
-    vector.fills = [{ type: "SOLID", color:color, opacity: 0}];
-    vector.strokes = [{ type: "SOLID", color:color, opacity: 1}];
+    vector.vectorPaths = [{windingRule: 'NONE', data: path}];
+
+    vector.fills = [{type: 'SOLID', color: color, opacity: 0}];
+    vector.strokes = [{type: 'SOLID', color: color, opacity: 1}];
     vector.strokeWeight = 2;
-    vector.blendMode = "NORMAL";
+    vector.blendMode = 'NORMAL';
     vector.name = name;
     vector.opacity = 1;
     vector.visible = true;
-    vector.blendMode = "PASS_THROUGH";
+    vector.blendMode = 'PASS_THROUGH';
     vector.constrainProportions = true;
     vector.cornerRadius = vector.cornerSmoothing = 0;
     vector.x = bounds[0];
@@ -89,35 +89,32 @@ export function createVector(selection: FrameNode, area: number[], name: string,
     selection.appendChild(vector);
 }
 
-export function initDocumentChange(){
-
-    figma.on("documentchange", (event) => {
-
+export function initDocumentChange() {
+    figma.on('documentchange', (event) => {
         let messages = event.documentChanges.map(documentChangeAsString);
-        messages = messages.filter(m => m);
-        if(!messages.length){
-        return;
+        messages = messages.filter((m) => m);
+        if (!messages.length) {
+            return;
         }
-        Logger.log("documentchange", messages);
+        Logger.log('documentchange', messages);
         //figma.ui.postMessage(messages, { origin: "*" });
 
         documentchange();
     });
 
-    figma.on("selectionchange", async () => {
+    figma.on('selectionchange', async () => {
         const selection = figma.currentPage.selection[0];
-        if(!selection) return null;
+        if (!selection) return null;
 
-        Logger.log("selectionchange", selection);
+        Logger.log('selectionchange', selection);
 
-        if (selection.type == 'INSTANCE'){
-            Logger.log("mainComponent", selection.mainComponent);
-            Logger.log("mainComponent?.parent", selection.mainComponent?.parent);
+        if (selection.type == 'INSTANCE') {
+            Logger.log('mainComponent', selection.mainComponent);
+            Logger.log('mainComponent?.parent', selection.mainComponent?.parent);
         }
-        
-        if (selection.type == 'FRAME' && selection.name == "$vector_frame"){
-            
-            Logger.log("---FRAME", selection);
+
+        if (selection.type == 'FRAME' && selection.name == '$vector_frame') {
+            Logger.log('---FRAME', selection);
 
             // const funfair = {
             //     spawnAreaExclusions: [],
@@ -130,7 +127,7 @@ export function initDocumentChange(){
             //     "unscaleAreas": [
             //     ],
             // };
-            
+
             // const world = funfair;
 
             // createVector(selection, world.accessArea, "@accessArea", figma.util.rgb('#00ff00'));
@@ -149,4 +146,3 @@ export function initDocumentChange(){
         //documentchange();
     });
 }
-

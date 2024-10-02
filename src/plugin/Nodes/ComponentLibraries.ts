@@ -1,21 +1,18 @@
-import { Logger } from "../../common/Logger";
-
-export const warnings:{
-    [id:string]:{
-        name: string,
-        pageId: string,
-        type: "warning",
-        title: string
-    }
+export const warnings: {
+    [id: string]: {
+        name: string;
+        pageId: string;
+        type: 'warning';
+        title: string;
+    };
 } = {};
 
 class Queue<T> {
-  
     public constructor(
         private elements: Record<number, T> = {},
         private head: number = 0,
-        private tail: number = 0
-    ) { }
+        private tail: number = 0,
+    ) {}
 
     public enqueue(element: T): void {
         this.elements[this.tail] = element;
@@ -41,7 +38,6 @@ class Queue<T> {
     public get isEmpty(): boolean {
         return this.length === 0;
     }
-
 }
 
 export const componentContentLoadQueue = new Queue<{
@@ -50,25 +46,24 @@ export const componentContentLoadQueue = new Queue<{
 }>();
 
 export class FigmaComponentContent {
-    public name: string = "";
-    public type: string = "";
-    public id: string = "";
-    private _bytes: string = "";
+    public name: string = '';
+    public type: string = '';
+    public id: string = '';
+    private _bytes: string = '';
     private _size: {
         width: number;
         height: number;
     } = {
-            width: 0,
-            height: 0
-        };
+        width: 0,
+        height: 0,
+    };
 
     private _isLoaded = false;
-    public get isLoaded(){
+    public get isLoaded() {
         return this._isLoaded;
     }
 
     constructor(node: SceneNode) {
-
         this.id = node.id;
         this.type = node.type;
         this.name = node.name;
@@ -77,24 +72,29 @@ export class FigmaComponentContent {
 
         componentContentLoadQueue.enqueue({
             node: node,
-            componentContent: this
+            componentContent: this,
         });
     }
 
-    private _hideText(node: SceneNode, hiddenTextNodes: string[] = []){
-        if (node.type == 'INSTANCE' || node.type == 'COMPONENT' || node.type == 'FRAME' || node.type == 'GROUP'){
-            for(let child of node.children){
-                if(!child.visible){
+    private _hideText(node: SceneNode, hiddenTextNodes: string[] = []) {
+        if (
+            node.type == 'INSTANCE' ||
+            node.type == 'COMPONENT' ||
+            node.type == 'FRAME' ||
+            node.type == 'GROUP'
+        ) {
+            for (const child of node.children) {
+                if (!child.visible) {
                     continue;
                 }
-    
-                switch(child.type){
-                    case 'TEXT':{
+
+                switch (child.type) {
+                    case 'TEXT': {
                         child.visible = false;
                         hiddenTextNodes.push(child.id);
                         break;
                     }
-                    default: 
+                    default:
                         this._hideText(child, hiddenTextNodes);
                 }
             }
@@ -102,93 +102,95 @@ export class FigmaComponentContent {
         return hiddenTextNodes;
     }
 
-    private _showText(node: SceneNode, hiddenTextNodes: string[]){
-        if (node.type == 'INSTANCE' || node.type == 'COMPONENT' || node.type == 'FRAME' || node.type == 'GROUP'){
-            for(let child of node.children){
-                switch(child.type){
-                    case 'TEXT':{
-                        if(hiddenTextNodes.indexOf(child.id) >= 0){
+    private _showText(node: SceneNode, hiddenTextNodes: string[]) {
+        if (
+            node.type == 'INSTANCE' ||
+            node.type == 'COMPONENT' ||
+            node.type == 'FRAME' ||
+            node.type == 'GROUP'
+        ) {
+            for (const child of node.children) {
+                switch (child.type) {
+                    case 'TEXT': {
+                        if (hiddenTextNodes.indexOf(child.id) >= 0) {
                             child.visible = true;
-
                         }
                         break;
                     }
-                    default: 
+                    default:
                         this._showText(child, hiddenTextNodes);
                 }
             }
         }
     }
 
-    async render(node: SceneNode){
+    async render(node: SceneNode) {
         const hiddenTextNodes = this._hideText(node);
-        
+
         const bytes = await node.exportAsync({
             format: 'PNG',
-            constraint: { type: 'SCALE', value: 1 },
-        })
+            constraint: {type: 'SCALE', value: 1},
+        });
         const image = figma.createImage(bytes);
-        this._bytes = "data:image/png;base64," + figma.base64Encode(bytes);
+        this._bytes = 'data:image/png;base64,' + figma.base64Encode(bytes);
         this._size = await image.getSizeAsync();
         this._isLoaded = true;
         this._showText(node, hiddenTextNodes);
     }
 
-    public clear(){
-        this._bytes = "";
+    public clear() {
+        this._bytes = '';
     }
 }
 
 export class FigmaComponentNode {
-    public type: string = "";
-    public id: string = "";
-    public name: string = "";
+    public type: string = '';
+    public id: string = '';
+    public name: string = '';
 
-    public content:FigmaComponentContent|null = null;
-    public componentSetId: string = "";
+    public content: FigmaComponentContent | null = null;
+    public componentSetId: string = '';
 
-    public get isLoaded(){
+    public get isLoaded() {
         return this.content == null || this.content.isLoaded;
     }
 
     constructor(node: InstanceNode) {
-        if(!node.mainComponent){
+        if (!node.mainComponent) {
             return;
         }
-        
+
         this.id = node.mainComponent.id;
         this.type = node.mainComponent.type;
         this.name = node.name;
 
-        if(node.mainComponent.parent?.type == "COMPONENT_SET"){
+        if (node.mainComponent.parent?.type == 'COMPONENT_SET') {
             this.content = null;
-        }else{
+        } else {
             this.content = new FigmaComponentContent(node.mainComponent);
         }
-        
     }
 }
 
 export class FigmaComponentSetNode {
-    public type: string = "";
-    public id: string = "";
-    public name: string = "";
-    
+    public type: string = '';
+    public id: string = '';
+    public name: string = '';
+
     //readonly defaultVariant: string = "";
     readonly variantGroupProperties: {
         [property: string]: {
-            values: string[]
-        }
+            values: string[];
+        };
     } = {};
 
     public variants: FigmaComponentContent[] = [];
 
-    public get isLoaded(){
-        return !this.variants.find(v => !v.isLoaded);
+    public get isLoaded() {
+        return !this.variants.find((v) => !v.isLoaded);
     }
 
     constructor(componentSetNode: ComponentSetNode) {
-
         this.id = componentSetNode.id;
         this.type = componentSetNode.type;
         this.name = componentSetNode.name;
@@ -204,21 +206,19 @@ export class FigmaComponentSetNode {
 
         for (let i = 0; i < componentSetNode.children.length; i++) {
             const node = componentSetNode.children[i];
-            
-            this.variants.push(new FigmaComponentContent(node))
+
+            this.variants.push(new FigmaComponentContent(node));
         }
 
         //this.defaultVariant = this.variants[0]?.id;
     }
-
 }
 
 export class ComponentLibraries {
-    
     private static _currentInstance: ComponentLibraries;
 
-    public static get currentInstance(){
-        if(!ComponentLibraries._currentInstance){
+    public static get currentInstance() {
+        if (!ComponentLibraries._currentInstance) {
             new ComponentLibraries();
         }
         return this._currentInstance;
@@ -238,42 +238,74 @@ export class ComponentLibraries {
         ComponentLibraries._currentInstance = this;
     }
 
-    public static addComponent(node: InstanceNode, overrides: {
-        id: string
-        overriddenFields: {
-            field: string,
-            value: any
-        }[]
-    }[]){
-        if(!node.mainComponent){
+    public static addComponent(
+        node: InstanceNode,
+        overrides: {
+            id: string;
+            overriddenFields: {
+                field: string;
+                value: any;
+            }[];
+        }[],
+    ) {
+        if (!node.mainComponent) {
             return;
         }
-        const component = this._currentInstance.components.find(component => { 
-            return component.id == node.mainComponent?.id; 
+        const component = this._currentInstance.components.find((component) => {
+            return component.id == node.mainComponent?.id;
         });
         if (component) return;
 
-        const componentNode = new FigmaComponentNode(node)
+        const componentNode = new FigmaComponentNode(node);
         this._currentInstance.components.push(componentNode);
 
-        if(node.mainComponent.parent?.type == "COMPONENT_SET"){
-            let componentSetNode = this._currentInstance.componentSets.find(componentSet => { 
-                return componentSet.id == node.mainComponent?.parent?.id; 
+        if (node.mainComponent.parent?.type == 'COMPONENT_SET') {
+            let componentSetNode = this._currentInstance.componentSets.find((componentSet) => {
+                return componentSet.id == node.mainComponent?.parent?.id;
             });
-            if(!componentSetNode){
+            if (!componentSetNode) {
                 componentSetNode = new FigmaComponentSetNode(node.mainComponent.parent);
                 this._currentInstance.componentSets.push(componentSetNode);
             }
             componentNode.componentSetId = componentSetNode.id;
 
             //Show problem variants
-            if (node.mainComponent.absoluteBoundingBox?.width != node.mainComponent.absoluteRenderBounds?.width || node.mainComponent.absoluteBoundingBox?.height != node.mainComponent.absoluteRenderBounds?.height)
-                console.warn("WARNING: Variant has wrong size: " + node.mainComponent.id + " " + node.mainComponent.parent.name + " " + node.mainComponent.name + " " + node.mainComponent.absoluteRenderBounds?.width + " " + node.mainComponent.absoluteRenderBounds?.height);
-
+            if (
+                node.mainComponent.absoluteBoundingBox?.width !=
+                    node.mainComponent.absoluteRenderBounds?.width ||
+                node.mainComponent.absoluteBoundingBox?.height !=
+                    node.mainComponent.absoluteRenderBounds?.height
+            )
+                console.warn(
+                    'WARNING: Variant has wrong size: ' +
+                        node.mainComponent.id +
+                        ' ' +
+                        node.mainComponent.parent.name +
+                        ' ' +
+                        node.mainComponent.name +
+                        ' ' +
+                        node.mainComponent.absoluteRenderBounds?.width +
+                        ' ' +
+                        node.mainComponent.absoluteRenderBounds?.height,
+                );
         } else {
             //Show problem components
-            if (node.mainComponent.absoluteBoundingBox?.width != node.mainComponent.absoluteRenderBounds?.width || node.mainComponent.absoluteBoundingBox?.height != node.mainComponent.absoluteRenderBounds?.height)
-                console.warn("WARNING: Component has wrong size: " + node.mainComponent.id + " " + node.mainComponent.name + " " + node.mainComponent.absoluteRenderBounds?.width + " " + node.mainComponent.absoluteRenderBounds?.height);
+            if (
+                node.mainComponent.absoluteBoundingBox?.width !=
+                    node.mainComponent.absoluteRenderBounds?.width ||
+                node.mainComponent.absoluteBoundingBox?.height !=
+                    node.mainComponent.absoluteRenderBounds?.height
+            )
+                console.warn(
+                    'WARNING: Component has wrong size: ' +
+                        node.mainComponent.id +
+                        ' ' +
+                        node.mainComponent.name +
+                        ' ' +
+                        node.mainComponent.absoluteRenderBounds?.width +
+                        ' ' +
+                        node.mainComponent.absoluteRenderBounds?.height,
+                );
         }
     }
 }

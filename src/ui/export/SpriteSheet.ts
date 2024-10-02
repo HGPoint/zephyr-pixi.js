@@ -1,13 +1,11 @@
-
 //const path = require('path');
-import Rect from './Rect';
-import Atlas, { Drawable } from './Atlas';
-import { resolve } from 'path';
+
+import Atlas from './Atlas';
 
 const md5 = require('./md5');
 
-function btoa(str:any) {
-    var buffer;
+function btoa(str: any) {
+    let buffer;
 
     if (str instanceof Buffer) {
         buffer = str;
@@ -18,16 +16,23 @@ function btoa(str:any) {
     return buffer.toString('base64');
 }
 
-export class Spritesheet {
+export class SpriteSheet {
     private _margin: number = 0;
     private _size: number = 1024;
     private _outputName: string;
     private _scaleBitmap: number = 1;
     private _currentBitmapsAtlasIndex: number;
-    private _bitmaps: {src:string;name:string}[];
+    private _bitmaps: {src: string; name: string}[];
     private _bitmapsAtlases: Atlas[] = [];
 
-    constructor(size:number, bitmaps:{src:string;name:string}[], scaleBitmap:number, margin:number, outputName: string, private _expand = true) {
+    constructor(
+        size: number,
+        bitmaps: {src: string; name: string}[],
+        scaleBitmap: number,
+        margin: number,
+        outputName: string,
+        private _expand = true,
+    ) {
         this._margin = margin;
         this._size = size;
         this._outputName = outputName;
@@ -38,8 +43,8 @@ export class Spritesheet {
         this._bitmapsAtlases = [];
 
         if (this._bitmaps.length > 0) {
-            var canvas = document.createElement('canvas');
-            canvas.width  = size;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
             canvas.height = size;
             this._bitmapsAtlases[0] = new Atlas(canvas, {margin: margin});
         }
@@ -51,14 +56,14 @@ export class Spritesheet {
         return await this.getOutput();
     }
 
-    async loadImage(base64img:string) {
-        return new Promise(resolve => {
-            var img = new Image();
-            img.onload = function() {
+    async loadImage(base64img: string) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = function () {
                 resolve(img);
             };
             img.src = base64img;
-        })
+        });
     }
 
     async addImages() {
@@ -88,47 +93,50 @@ export class Spritesheet {
 
         let bitmapHashs: Array<string> = [];
 
-        while(bitmaps.length > 0){
-            
+        while (bitmaps.length > 0) {
             for (let i = bitmaps.length - 1; i >= 0; i--) {
                 const bitmap = bitmaps[i];
 
-                if(!bitmap.src){
+                if (!bitmap.src) {
                     bitmaps.splice(i, 1);
                     continue;
                 }
 
-                const image = await this.loadImage(`${bitmap.src}`) as HTMLImageElement;
+                const image = (await this.loadImage(`${bitmap.src}`)) as HTMLImageElement;
 
                 const id = bitmap.name;
 
-                let node = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].pack(id, image);
+                const node = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].pack(id, image);
 
                 if (node) {
                     bitmaps.splice(i, 1);
                     bitmapHashs.push(md5(bitmap.src));
                 } else {
-                    if(this._expand){
-                        let expand = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].expand(id, image);
+                    if (this._expand) {
+                        const expand = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].expand(
+                            id,
+                            image,
+                        );
                         bitmaps.splice(i, 1);
                         bitmapHashs.push(md5(bitmap.src));
                     }
                 }
             }
 
-            const atlasHash = md5(bitmapHashs.join("_"));
+            const atlasHash = md5(bitmapHashs.join('_'));
             this._bitmapsAtlases[this._currentBitmapsAtlasIndex].hash = atlasHash;
 
-            if(bitmaps.length > 0){
+            if (bitmaps.length > 0) {
                 bitmapHashs = [];
                 this._currentBitmapsAtlasIndex++;
-                var canvas = document.createElement('canvas');
-                canvas.width  = this._size;
+                const canvas = document.createElement('canvas');
+                canvas.width = this._size;
                 canvas.height = this._size;
-                this._bitmapsAtlases[this._currentBitmapsAtlasIndex] = new Atlas(canvas, {margin: this._margin});
+                this._bitmapsAtlases[this._currentBitmapsAtlasIndex] = new Atlas(canvas, {
+                    margin: this._margin,
+                });
             }
         }
-
 
         // for (let bitmap of bitmaps) {
 
@@ -152,13 +160,12 @@ export class Spritesheet {
         //             node = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].pack(id, image);
         //             if (!node){
         //                 let expand = this._bitmapsAtlases[this._currentBitmapsAtlasIndex].expand(id, image);
-        //                 console.log("can't pack image, try to increase spritesheet size", item);
+        //                 console.log("can't pack image, try to increase spriteSheet size", item);
         //             }
         //         }
 
         //     }
         // }
-
     }
 
     async getOutput() {
@@ -171,35 +178,33 @@ export class Spritesheet {
             //console.log("atlas", atlas);
 
             let bitmapsAtlasFileName = `${this._outputName}`;
-            if(i > 0){
+            if (i > 0) {
                 bitmapsAtlasFileName += `_${i}`;
             }
-            const imageBitmaps = canvas.toDataURL();//.replace(/^data:image\/png;base64,/, '');
+            const imageBitmaps = canvas.toDataURL(); //.replace(/^data:image\/png;base64,/, '');
 
             const bitmapsData = {
                 frames: atlas.getFrames(),
                 meta: {
-                    app: "hg",
+                    app: 'hg',
                     scale: this._scaleBitmap,
                     image: `${bitmapsAtlasFileName}.png?v=${atlas.hash}`,
                     size: {
                         w: atlas.rootNode.rect.w,
-                        h: atlas.rootNode.rect.h
-                    }
-                }
+                        h: atlas.rootNode.rect.h,
+                    },
+                },
             };
 
             bitmaps.push({
                 name: bitmapsAtlasFileName,
                 json: bitmapsData,
-                image: imageBitmaps
+                image: imageBitmaps,
             });
         }
 
         return {
-            bitmaps: bitmaps
-        }
+            bitmaps: bitmaps,
+        };
     }
-
 }
-

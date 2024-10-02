@@ -1,99 +1,122 @@
 import * as React from 'react';
-import { exportData } from "./export/index";
-import { Spritesheet } from "./export/Spritesheet";
-import { IClientStorageData } from "../common/IClientStorageData";
-import { DocumentSpritesheets } from "./DocumentSpritesheets";
-import { openLoadingDialog } from './LoadingDialog';
-import { delay } from '../plugin/Utils/utils';
-import { openSettingsDialog } from './SettingsDialog';
-import {DocumentFilter} from "./DocumentFilter";
-import {Logger} from "../common/Logger";
 
-let _url = "";
-let _count:number = 0;
-let _selectedCount:number = 0;
+import {delay} from '../plugin/Utils/utils';
 
-let _setNavigationBar: (url:string) => void;
-let _setNavigationBarData: (selectedCount: number, count:number) => void;
+import {DocumentFilter} from './DocumentFilter';
+import {openLoadingDialog} from './LoadingDialog';
+import {openSettingsDialog} from './SettingsDialog';
 
-export function setNavigationBar(url:string){
+let _url = '';
+let _count: number = 0;
+let _selectedCount: number = 0;
+
+let _setNavigationBar: (url: string) => void;
+let _setNavigationBarData: (selectedCount: number, count: number) => void;
+
+export function setNavigationBar(url: string) {
     _url = url;
-    _setNavigationBar && _setNavigationBar(url);
+    if (_setNavigationBar) _setNavigationBar(url);
 }
 
-export function setNavigationBarCount(selectedCount: number, count:number){
+export function setNavigationBarCount(selectedCount: number, count: number) {
     _selectedCount = selectedCount;
     _count = count;
-    _setNavigationBarData && _setNavigationBarData(selectedCount, count);
+    if (_setNavigationBarData) _setNavigationBarData(selectedCount, count);
 }
 
-export class NavigationBar extends React.Component {
+interface NavigationBarState {
+    url: string;
+    count: number;
+    selectedCount: number;
+}
 
-    state:{
-        url: string;
-        count: number;
-        selectedCount: number,
-    } = {
-        url:"",
+export class NavigationBar extends React.Component<Record<string, never>, NavigationBarState> {
+    state: NavigationBarState = {
+        url: '',
         count: _count,
         selectedCount: _selectedCount,
     };
 
+    componentDidMount() {
+        // Назначаем глобальные функции после монтирования компонента
+        _setNavigationBar = this._setNavigationBar;
+        _setNavigationBarData = this._setNavigationBarData;
+    }
+
+    private _setNavigationBar = (url: string) => {
+        this.setState((prevState) => ({
+            ...prevState,
+            url: url,
+        }));
+    };
+
+    private _setNavigationBarData = (selectedCount: number, count: number) => {
+        this.setState((prevState) => ({
+            ...prevState,
+            selectedCount: selectedCount,
+            count: count,
+        }));
+    };
+
     render() {
-
-        _setNavigationBar = (url:string) => {
-            this.setState({ 
-                url: url
-            });
-        };
-
-        _setNavigationBarData = (selectedCount: number, count:number) => {
-            this.setState({
-                selectedCount: selectedCount,
-                count: count,
-            });
-        };
-
         const onExport = async () => {
-            if(!this.state.selectedCount){
+            if (!this.state.selectedCount) {
                 return;
             }
             openLoadingDialog();
             await delay(200);
-            parent.postMessage({ pluginMessage: { type: "export", data: { filteredIds: DocumentFilter.instance.getSelectedIds()} } }, "*");
+            parent.postMessage(
+                {
+                    pluginMessage: {
+                        type: 'export',
+                        data: {filteredIds: DocumentFilter.instance.getSelectedIds()},
+                    },
+                },
+                '*',
+            );
         };
 
         const onExportAll = async () => {
             openLoadingDialog();
             await delay(200);
-            parent.postMessage({ pluginMessage: { type: "exportAll" } }, "*");
+            parent.postMessage({pluginMessage: {type: 'exportAll'}}, '*');
         };
 
         const onExportFigma = async () => {
             openLoadingDialog();
             await delay(200);
-            parent.postMessage({ pluginMessage: { type: "exportFigma" } }, "*");
+            parent.postMessage({pluginMessage: {type: 'exportFigma'}}, '*');
         };
-        
+
         const onApply = async () => {
-            if(!this.state.selectedCount){
+            if (!this.state.selectedCount) {
                 return;
             }
             openLoadingDialog();
             await delay(200);
-            parent.postMessage({ pluginMessage: { type: "apply", data: { filteredIds: DocumentFilter.instance.getSelectedIds()} } }, "*");
+            parent.postMessage(
+                {
+                    pluginMessage: {
+                        type: 'apply',
+                        data: {filteredIds: DocumentFilter.instance.getSelectedIds()},
+                    },
+                },
+                '*',
+            );
         };
-        
+
         const onGo = () => {
-            const iframe = document.getElementById("gameFrame") as HTMLIFrameElement;
-            iframe.src = this.state.url || "";
-        
-            parent.postMessage({ pluginMessage: { type: "clientStorageData", data: { url: iframe.src } } }, "*");
+            const iframe = document.getElementById('gameFrame') as HTMLIFrameElement;
+            iframe.src = this.state.url || '';
+
+            parent.postMessage(
+                {pluginMessage: {type: 'clientStorageData', data: {url: iframe.src}}},
+                '*',
+            );
         };
-        
-        const onEdit = () => {
-        };
-    
+
+        const onEdit = () => {};
+
         const onSettings = () => {
             openSettingsDialog();
         };
@@ -102,37 +125,98 @@ export class NavigationBar extends React.Component {
             <>
                 <div className="navbar bg-base-100">
                     <div className="flex-none">
-                    <label onClick={onEdit} htmlFor="my-drawer" className="drawer-button btn btn-sm btn-square btn-ghost mx-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    </label>
+                        <label
+                            onClick={onEdit}
+                            htmlFor="my-drawer"
+                            className="drawer-button btn btn-sm btn-square btn-ghost mx-0.5"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                className="inline-block w-5 h-5 stroke-current"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                ></path>
+                            </svg>
+                        </label>
                     </div>
                     <div className="flex-1">
-                    <input  value={this.state.url} onChange={(e) => this.setState({url: e.target.value})}  type="text" placeholder="url" className="input input-bordered input-sm w-full max-w-xs" />
-                    <div className="tooltip tooltip-bottom mx-0.5" data-tip="open page">
-                        <button className="btn btn-sm mx-0.5" onClick={onGo}><img src={require("./icons/go.svg")}/></button>
-                    </div>
+                        <input
+                            value={this.state.url}
+                            onChange={(e) =>
+                                this.setState((prevState) => ({
+                                    ...prevState,
+                                    url: e.target.value,
+                                }))
+                            }
+                            type="text"
+                            placeholder="url"
+                            className="input input-bordered input-sm w-full max-w-xs"
+                        />
+                        <div className="tooltip tooltip-bottom mx-0.5" data-tip="open page">
+                            <button className="btn btn-sm mx-0.5" onClick={onGo}>
+                                <img src={require('./icons/go.svg')} />
+                            </button>
+                        </div>
                     </div>
                     <div className="flex-none">
-                    <div className="indicator">
-                        <span className="indicator-item badge">{this.state.selectedCount}/{this.state.count}</span>
-                        <button className="btn btn-sm mx-0.5" onClick={onApply}>Apply</button>
-                    </div>
-                    <div className="indicator mx-7">
-                        <span className="indicator-item badge badge-secondary">{this.state.selectedCount}</span>
-                        <button className="btn btn-sm" onClick={onExport}>Export selected...</button>
-                    </div>
-                    <div className="dropdown dropdown-bottom dropdown-end">
-                        <label {...{tabIndex: 1}} className="btn btn-sm btn-outline btn-accent">Export</label>
-                        <ul {...{tabIndex: 1}} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                            <li><a onClick={onExportAll}>Export all...</a></li>
-                            <li><a className="btn-disabled">Export root.figma</a></li>
-                            {/* <li><a onClick={onExportFigma}>Export root.figma</a></li> */}
-                        </ul>
-                    </div>
-                    {/* <button className="btn btn-sm btn-outline btn-accent" onClick={onExportAll}>Export all...</button> */}
-                    <button className="btn btn-sm btn-square btn-ghost mx-0.5" onClick={onSettings}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
-                    </button>
+                        <div className="indicator">
+                            <span className="indicator-item badge">
+                                {this.state.selectedCount}/{this.state.count}
+                            </span>
+                            <button className="btn btn-sm mx-0.5" onClick={onApply}>
+                                Apply
+                            </button>
+                        </div>
+                        <div className="indicator mx-7">
+                            <span className="indicator-item badge badge-secondary">
+                                {this.state.selectedCount}
+                            </span>
+                            <button className="btn btn-sm" onClick={onExport}>
+                                Export selected...
+                            </button>
+                        </div>
+                        <div className="dropdown dropdown-bottom dropdown-end">
+                            <label {...{tabIndex: 1}} className="btn btn-sm btn-outline btn-accent">
+                                Export
+                            </label>
+                            <ul
+                                {...{tabIndex: 1}}
+                                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                            >
+                                <li>
+                                    <a onClick={onExportAll}>Export all...</a>
+                                </li>
+                                <li>
+                                    <a className="btn-disabled">Export root.figma</a>
+                                </li>
+                                {/* <li><a onClick={onExportFigma}>Export root.figma</a></li> */}
+                            </ul>
+                        </div>
+                        {/* <button className="btn btn-sm btn-outline btn-accent" onClick={onExportAll}>Export all...</button> */}
+                        <button
+                            className="btn btn-sm btn-square btn-ghost mx-0.5"
+                            onClick={onSettings}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                className="inline-block w-5 h-5 stroke-current"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+                                ></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </>

@@ -1,6 +1,6 @@
 export interface IClientStorageData {
-  pages: string,
-  url: string,
-  width: number, 
-  height: number
+    pages: string;
+    url: string;
+    width: number;
+    height: number;
 }

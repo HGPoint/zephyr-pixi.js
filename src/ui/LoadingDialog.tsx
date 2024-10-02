@@ -1,68 +1,77 @@
 import * as React from 'react';
-import { exportData } from "./export/index";
-import { Spritesheet } from "./export/Spritesheet";
-import { IClientStorageData } from "../common/IClientStorageData";
-import { DocumentSpritesheets } from "./DocumentSpritesheets";
 
+let _openLoadingDialog: (open: boolean, ok: boolean) => void;
+let _setProgressLoadingDialog: (value: number, desc: string) => void;
 
-let _openLoadingDialog: (open: boolean,ok: boolean) => void;
-let _setProgressLoadingDialog: (value:number, desc:string) => void;
-
-export function openLoadingDialog(){
+export function openLoadingDialog() {
     _openLoadingDialog(true, false);
 }
 
-export function completeLoadingDialog(){
+export function completeLoadingDialog() {
     _openLoadingDialog(true, true);
 }
 
-export function setProgressLoadingDialog(value: number, desc:string){
+export function setProgressLoadingDialog(value: number, desc: string) {
     _setProgressLoadingDialog(value, desc);
 }
 
-export class LoadingDialog extends React.Component {
+interface LoadingDialogState {
+    open: boolean;
+    ok: boolean;
+    progress: number;
+    desc: string;
+}
 
-    state:{
-        open: boolean;
-        ok: boolean;
-        proress: number;
-        desc:string;
-    } = {
+export class LoadingDialog extends React.Component<Record<string, never>, LoadingDialogState> {
+    state: LoadingDialogState = {
         open: false,
         ok: false,
-        proress: 0,
-        desc:""
+        progress: 0,
+        desc: '',
+    };
+
+    componentDidMount() {
+        // Назначаем глобальные функции после монтирования компонента
+        _openLoadingDialog = this._openLoadingDialog;
+        _setProgressLoadingDialog = this._setProgressLoadingDialog;
+    }
+
+    private _openLoadingDialog = (open: boolean, ok: boolean) => {
+        this.setState((prevState) => ({
+            ...prevState,
+            open: open && !ok,
+            ok: ok,
+            desc: '',
+        }));
+    };
+
+    private _setProgressLoadingDialog = (value: number, desc: string) => {
+        this.setState((prevState) => ({
+            ...prevState,
+            progress: Math.round(value * 100),
+            desc: desc,
+        }));
     };
 
     render() {
+        const handleChange = () => {};
 
-        _openLoadingDialog = (open: boolean, ok: boolean) => {
-            this.setState({ 
-                open: open && !ok,
-                ok: ok,
-                desc: ""
-            });
-        }; 
-        
-        _setProgressLoadingDialog = (value:number, desc:string) => {
-            this.setState({ 
-                proress: Math.round(value * 100),
-                desc: desc
-            });
-        };
+        /*const onClose = () => {
+            this.setState((prevState) => ({
+                ...prevState,
+                open: false,
+            }));
+        };*/
 
-        const handleChange = () => {
-        };
-
-        const onClose = () => {
-            this.setState({ 
-                open: false
-            });
-        };
-    
         return (
             <>
-                <input type="checkbox" checked={this.state.open} onChange={handleChange} id="my_modal_6" className="modal-toggle" />
+                <input
+                    type="checkbox"
+                    checked={this.state.open}
+                    onChange={handleChange}
+                    id="my_modal_6"
+                    className="modal-toggle"
+                />
                 <div className="modal">
                     <div className="modal-box">
                         {/* <form method="dialog">
@@ -72,11 +81,14 @@ export class LoadingDialog extends React.Component {
                         {/* { !this.state.ok && <h3 className="font-bold text-lg my-4">Loading...</h3>} */}
                         <div className="flex flex-col w-full">
                             <div className="grid h-10 bg-base-100 place-items-center">
-                                
-                                { !this.state.ok && <progress className="progress progress-success w-56" value={this.state.proress} max="100"></progress>}
-                                { !this.state.ok && <span>{this.state.desc}</span>}
-                                
-
+                                {!this.state.ok && (
+                                    <progress
+                                        className="progress progress-success w-56"
+                                        value={this.state.progress}
+                                        max="100"
+                                    ></progress>
+                                )}
+                                {!this.state.ok && <span>{this.state.desc}</span>}
                             </div>
                         </div>
 

@@ -1,21 +1,18 @@
-import { BaseContainer, IRectangleNodeProp } from "./BaseNodeContainer";
-import { ImagePaintContainer } from "../Paint/ImagePaintContainer";
-import { SolidPaintContainer } from "../Paint/SolidPaintContainer";
-import { GradientPaintContainer } from "../Paint/GradientPaintContainer";
-import { Logger } from "../../common/Logger";
+import {BaseContainer} from './BaseNodeContainer';
 
 export class VectorPath {
-    constructor(public data: string, public windingRule: 'NONZERO' | 'EVENODD' | 'NONE') {
-    }
+    constructor(
+        public data: string,
+        public windingRule: 'NONZERO' | 'EVENODD' | 'NONE',
+    ) {}
 }
 
 export class VectorNodeContainer extends BaseContainer {
-
     // private _fill: Array<ImagePaintContainer | SolidPaintContainer | GradientPaintContainer> = [];
     // public get fill() {
     //     return this._fill;
     // }
-    
+
     // private _fillGeometry: Array<VectorPath> = [];
     // public get fillGeometry() {
     //     return this._fillGeometry;
@@ -51,10 +48,5 @@ export class VectorNodeContainer extends BaseContainer {
         // // }
 
         // this._fillGeometry = node.fillGeometry.map(g => new VectorPath(g.data, g.windingRule));
-
     }
-
 }
-
-
-

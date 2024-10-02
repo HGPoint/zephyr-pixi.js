@@ -1,24 +1,25 @@
-import { ComponentLibraries } from "./ComponentLibraries"
-import { IBaseNode } from "../../common/IBaseNode"
+import {IBaseNode} from '../../common/IBaseNode';
+
+import {ComponentLibraries} from './ComponentLibraries';
 
 export interface IDefaultNode {
-    absoluteTransform: Transform
-    relativeTransform: Transform
-    x: number
-    y: number
-    width: number
-    height: number
-    minWidth: number | null
-    minHeight: number | null
-    maxWidth: number | null
-    maxHeight: number | null
-    absoluteBoundingBox: Rect | null
-    layoutPositioning: 'AUTO' | 'ABSOLUTE'
-    layoutSizingHorizontal: 'FIXED' | 'HUG' | 'FILL'
-    layoutSizingVertical: 'FIXED' | 'HUG' | 'FILL'
+    absoluteTransform: Transform;
+    relativeTransform: Transform;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    minWidth: number | null;
+    minHeight: number | null;
+    maxWidth: number | null;
+    maxHeight: number | null;
+    absoluteBoundingBox: Rect | null;
+    layoutPositioning: 'AUTO' | 'ABSOLUTE';
+    layoutSizingHorizontal: 'FIXED' | 'HUG' | 'FILL';
+    layoutSizingVertical: 'FIXED' | 'HUG' | 'FILL';
     constraints: {
-        horizontal: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE',
-        vertical: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE'
+        horizontal: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE';
+        vertical: 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE';
     };
 }
 
@@ -52,14 +53,13 @@ export interface IInstanceNodeProp extends IDefaultNode {
     rotation: number;
     mainComponent: string | null;
     overrides: {
-        id: string
+        id: string;
         overriddenFields: {
-            field: string,
-            value: any
-        }[]
+            field: string;
+            value: any;
+        }[];
     }[];
 }
-
 
 export interface IRectangleNodeProp extends IDefaultNode {
     isMask: boolean;
@@ -68,7 +68,7 @@ export interface IRectangleNodeProp extends IDefaultNode {
 
 export interface IVectorNodeProp extends IDefaultNode {
     vectorPaths: {
-        windingRule: 'NONZERO' | 'EVENODD'| 'NONE';
+        windingRule: 'NONZERO' | 'EVENODD' | 'NONE';
         data: string;
     }[];
 }
@@ -78,28 +78,28 @@ export interface ITextNodeProp extends IDefaultNode {
     textAlignVertical: 'TOP' | 'CENTER' | 'BOTTOM';
     textAutoResize: 'NONE' | 'WIDTH_AND_HEIGHT' | 'HEIGHT' | 'TRUNCATE';
     autoRename: boolean;
-    textStyleId: string;// | PluginAPI['mixed']
+    textStyleId: string; // | PluginAPI['mixed']
     paragraphIndent: number;
     paragraphSpacing: number;
     fontSize: number;
     fontName: {
-        family: string
-        style: string
+        family: string;
+        style: string;
     };
     fontWeight: number;
     textCase: 'ORIGINAL' | 'UPPER' | 'LOWER' | 'TITLE';
     textDecoration: 'NONE' | 'UNDERLINE' | 'STRIKETHROUGH';
     letterSpacing: {
-        value: number
-        unit: 'PIXELS' | 'PERCENT'
+        value: number;
+        unit: 'PIXELS' | 'PERCENT';
     };
     lineHeight: {
-        value: number
-        unit: 'AUTO'| 'PIXELS' | 'PERCENT'
+        value: number;
+        unit: 'AUTO' | 'PIXELS' | 'PERCENT';
     };
     hyperlink: {
-        type: 'URL' | 'NODE'
-        value: string
+        type: 'URL' | 'NODE';
+        value: string;
     } | null;
     characters: string;
     strokeWeight: number;
@@ -107,11 +107,36 @@ export interface ITextNodeProp extends IDefaultNode {
 }
 
 export class BaseContainer implements IBaseNode {
-    public type: 'FRAME' | 'GROUP' | 'SLICE' | 'RECTANGLE' | 'LINE' | 'ELLIPSE' | 'POLYGON' |'STAR'
-    |'VECTOR'|'TEXT'|'COMPONENT_SET'|'COMPONENT'|'INSTANCE'|'BOOLEAN_OPERATION'|'STICKY' |'STAMP'|'HIGHLIGHT'|'WASHI_TAPE'|'SHAPE_WITH_TEXT'
-    |'CODE_BLOCK'|'CONNECTOR'|'WIDGET'|'EMBED'|'LINK_UNFURL'|'MEDIA'|'SECTION'|"" = "";
-    public id: string = "";
-    public name: string = "";
+    public type:
+        | 'FRAME'
+        | 'GROUP'
+        | 'SLICE'
+        | 'RECTANGLE'
+        | 'LINE'
+        | 'ELLIPSE'
+        | 'POLYGON'
+        | 'STAR'
+        | 'VECTOR'
+        | 'TEXT'
+        | 'COMPONENT_SET'
+        | 'COMPONENT'
+        | 'INSTANCE'
+        | 'BOOLEAN_OPERATION'
+        | 'STICKY'
+        | 'STAMP'
+        | 'HIGHLIGHT'
+        | 'WASHI_TAPE'
+        | 'SHAPE_WITH_TEXT'
+        | 'CODE_BLOCK'
+        | 'CONNECTOR'
+        | 'WIDGET'
+        | 'EMBED'
+        | 'LINK_UNFURL'
+        | 'MEDIA'
+        | 'SECTION'
+        | '' = '';
+    public id: string = '';
+    public name: string = '';
 
     public isMeta = false;
     public visible = false;
@@ -120,7 +145,13 @@ export class BaseContainer implements IBaseNode {
     public x = 0;
     public y = 0;
 
-    public properties: IVectorNodeProp | IRectangleNodeProp | ITextNodeProp | IBaseFrameNodeProp | IInstanceNodeProp | null = null;
+    public properties:
+        | IVectorNodeProp
+        | IRectangleNodeProp
+        | ITextNodeProp
+        | IBaseFrameNodeProp
+        | IInstanceNodeProp
+        | null = null;
 
     public isEmpty = false;
 
@@ -136,12 +167,12 @@ export class BaseContainer implements IBaseNode {
         this.y = node.y;
         this.isEmpty = isEmpty;
 
-        if(isEmpty){
-            this.type = "";
+        if (isEmpty) {
+            this.type = '';
             return;
         }
 
-        if(node.type == "FRAME"){
+        if (node.type == 'FRAME') {
             this.properties = {
                 opacity: node.opacity,
                 rotation: node.rotation,
@@ -149,7 +180,7 @@ export class BaseContainer implements IBaseNode {
                 layoutAlign: node.layoutAlign,
                 layoutGrow: node.layoutGrow,
                 primaryAxisSizingMode: node.primaryAxisSizingMode,
-                counterAxisSizingMode: node.counterAxisSizingMode, 
+                counterAxisSizingMode: node.counterAxisSizingMode,
                 primaryAxisAlignItems: node.primaryAxisAlignItems,
                 counterAxisAlignItems: node.counterAxisAlignItems,
                 constraints: node.constraints,
@@ -164,10 +195,10 @@ export class BaseContainer implements IBaseNode {
                 itemReverseZIndex: node.itemReverseZIndex,
                 strokesIncludedInLayout: node.strokesIncludedInLayout,
                 gridStyleId: node.gridStyleId,
-                clipsContent: node.clipsContent
+                clipsContent: node.clipsContent,
             } as IBaseFrameNodeProp;
-        } else if(node.type == "INSTANCE"){
-            this.properties =  {
+        } else if (node.type == 'INSTANCE') {
+            this.properties = {
                 opacity: node.opacity,
                 rotation: node.rotation,
                 mainComponent: node.mainComponent?.id,
@@ -175,28 +206,31 @@ export class BaseContainer implements IBaseNode {
                 layoutSizingHorizontal: node.layoutSizingHorizontal,
                 layoutSizingVertical: node.layoutSizingVertical,
                 constraints: node.constraints,
-                overrides: node.overrides.map(ov => {
+                overrides: node.overrides.map((ov) => {
                     return {
                         id: ov.id,
-                        overriddenFields: ov.overriddenFields.map(of => {
+                        overriddenFields: ov.overriddenFields.map((of) => {
                             return {
                                 field: of,
                                 //@ts-ignore
-                                value: node[`${of}`] as any
+                                value: node[`${of}`] as any,
                             };
-                        })
-                    }
-                })
+                        }),
+                    };
+                }),
             } as IInstanceNodeProp;
 
-            if(node.mainComponent?.parent && node.mainComponent.parent.name == "Fonts"){
-                this.type = "FRAME";
+            if (node.mainComponent?.parent && node.mainComponent.parent.name == 'Fonts') {
+                this.type = 'FRAME';
                 this.properties.mainComponent = null;
             } else {
-                node.mainComponent && ComponentLibraries.addComponent(node, (this.properties as IInstanceNodeProp).overrides);
+                node.mainComponent &&
+                    ComponentLibraries.addComponent(
+                        node,
+                        (this.properties as IInstanceNodeProp).overrides,
+                    );
             }
-
-        } else if(node.type == "TEXT"){
+        } else if (node.type == 'TEXT') {
             this.properties = {
                 textAlignHorizontal: node.textAlignHorizontal,
                 textAlignVertical: node.textAlignVertical,
@@ -211,7 +245,7 @@ export class BaseContainer implements IBaseNode {
                     //@ts-ignore
                     family: node.fontName?.family,
                     //@ts-ignore
-                    style: node.fontName?.style
+                    style: node.fontName?.style,
                 },
                 fontWeight: node.fontWeight,
                 textCase: node.textCase,
@@ -220,19 +254,19 @@ export class BaseContainer implements IBaseNode {
                     //@ts-ignore
                     value: node.letterSpacing?.value,
                     //@ts-ignore
-                    unit: node.letterSpacing?.unit
+                    unit: node.letterSpacing?.unit,
                 },
                 lineHeight: {
                     //@ts-ignore
                     value: node.lineHeight?.value,
                     //@ts-ignore
-                    unit: node.lineHeight?.unit
+                    unit: node.lineHeight?.unit,
                 },
                 hyperlink: {
                     //@ts-ignore
                     type: node.hyperlink?.type,
                     //@ts-ignore
-                    value: node.hyperlink?.value
+                    value: node.hyperlink?.value,
                 },
                 characters: node.characters,
                 strokeWeight: node.strokeWeight,
@@ -240,28 +274,28 @@ export class BaseContainer implements IBaseNode {
                 layoutSizingHorizontal: node.layoutSizingHorizontal,
                 layoutSizingVertical: node.layoutSizingVertical,
                 rotation: node.rotation,
-            } as ITextNodeProp
-        } else if(node.type == "RECTANGLE"){
+            } as ITextNodeProp;
+        } else if (node.type == 'RECTANGLE') {
             this.properties = {
                 isMask: node.isMask,
-                cornerRadius: typeof node.cornerRadius === 'number'  ? node.cornerRadius : 0,
+                cornerRadius: typeof node.cornerRadius === 'number' ? node.cornerRadius : 0,
                 layoutPositioning: node.layoutPositioning,
                 layoutSizingHorizontal: node.layoutSizingHorizontal,
                 layoutSizingVertical: node.layoutSizingVertical,
                 constraints: node.constraints,
             } as IRectangleNodeProp;
-        } else if(node.type == "VECTOR"){
+        } else if (node.type == 'VECTOR') {
             this.properties = {
-                vectorPaths: node.vectorPaths.map(v => { 
+                vectorPaths: node.vectorPaths.map((v) => {
                     return {
                         windingRule: v.windingRule,
-                        data: v.data
-                    }
-                })
+                        data: v.data,
+                    };
+                }),
             } as IVectorNodeProp;
         }
 
-        if(this.properties){
+        if (this.properties) {
             this.properties.height = node.height;
             this.properties.width = node.width;
             this.properties.minWidth = node.minWidth;
@@ -271,12 +305,28 @@ export class BaseContainer implements IBaseNode {
             this.properties.x = node.x;
             this.properties.y = node.y;
             this.properties.absoluteTransform = [
-                [node.absoluteTransform[0][0],node.absoluteTransform[0][1], node.absoluteTransform[0][2]],
-                [node.absoluteTransform[1][0],node.absoluteTransform[1][1], node.absoluteTransform[1][2]]
+                [
+                    node.absoluteTransform[0][0],
+                    node.absoluteTransform[0][1],
+                    node.absoluteTransform[0][2],
+                ],
+                [
+                    node.absoluteTransform[1][0],
+                    node.absoluteTransform[1][1],
+                    node.absoluteTransform[1][2],
+                ],
             ];
             this.properties.relativeTransform = [
-                [node.relativeTransform[0][0],node.relativeTransform[0][1], node.relativeTransform[0][2]],
-                [node.relativeTransform[1][0],node.relativeTransform[1][1], node.relativeTransform[1][2]]
+                [
+                    node.relativeTransform[0][0],
+                    node.relativeTransform[0][1],
+                    node.relativeTransform[0][2],
+                ],
+                [
+                    node.relativeTransform[1][0],
+                    node.relativeTransform[1][1],
+                    node.relativeTransform[1][2],
+                ],
             ];
         }
     }

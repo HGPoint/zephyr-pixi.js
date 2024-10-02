@@ -1,10 +1,10 @@
-import { BaseDocument } from "./Page/BaseDocument";
+import {BaseDocument} from './Page/BaseDocument';
 
 interface ExportSettingsJson {
-    readonly format: 'JSON'
-    readonly suffix: "";
+    readonly format: 'JSON';
+    readonly suffix: '';
 }
-  
+
 export interface IExportableResources {
     name: string;
     id: string;
@@ -18,54 +18,52 @@ export interface IExportableResources {
 
 // function str2ab(str:string) {
 //     var s = encode_utf8(str)
-//     var buf = new ArrayBuffer(s.length); 
+//     var buf = new ArrayBuffer(s.length);
 //     var bufView = new Uint8Array(buf);
 //     for (var i=0, strLen=s.length; i<strLen; i++) {
 //     bufView[i] = s.charCodeAt(i);
 //     }
 //     return bufView;
 // }
-  
-export async function exportDocument(exportAs:"exportFigma"|"exportAll"|"export") {
 
-    const nodes:Array<SceneNode> = [];
+export async function exportDocument(exportAs: 'exportFigma' | 'exportAll' | 'export') {
+    const nodes: Array<SceneNode> = [];
 
     const components = BaseDocument.current.components.components;
     for (let i = 0; i < components.length; i++) {
         const component = components[i];
-        if(component.content){
+        if (component.content) {
             const node = figma.getNodeById(component.id) as SceneNode;
-            node && nodes.push(node);
+            if (node) nodes.push(node);
         }
     }
 
     const componentSets = BaseDocument.current.components.componentSets;
     for (let i = 0; i < componentSets.length; i++) {
         const componentSet = componentSets[i];
-        componentSet.variants.forEach(variant => {
+        componentSet.variants.forEach((variant) => {
             const node = figma.getNodeById(variant.id) as SceneNode;
-            node && nodes.push(node);
-        })
+            if (node) nodes.push(node);
+        });
     }
 
-    let exportableResources: IExportableResources[] = []
-    for (let node of nodes) {
-
-        let { name, exportSettings, id } = node;
+    const exportableResources: IExportableResources[] = [];
+    for (const node of nodes) {
+        let {name, exportSettings, id} = node;
         if (exportSettings.length === 0) {
-        exportSettings = [
-                { 
-                    format: "PNG", 
-                    suffix: '', 
-                    constraint: { type: "SCALE", value: 1 }, 
-                    contentsOnly: true 
-                }
+            exportSettings = [
+                {
+                    format: 'PNG',
+                    suffix: '',
+                    constraint: {type: 'SCALE', value: 1},
+                    contentsOnly: true,
+                },
             ];
         }
 
-        if(exportAs == "exportAll" || exportAs == "export"){
-            for (let setting of exportSettings) {
-                let defaultSetting = setting;
+        if (exportAs == 'exportAll' || exportAs == 'export') {
+            for (const setting of exportSettings) {
+                const defaultSetting = setting;
                 const bytes = await node.exportAsync(defaultSetting);
                 exportableResources.push({
                     name,
@@ -88,23 +86,32 @@ export async function exportDocument(exportAs:"exportFigma"|"exportAll"|"export"
     //     setting : { format: "JSON", suffix: "" },
     //     bytes: uint8array,
     // });
-    switch(exportAs){
-        case "exportFigma":
-            figma.ui.postMessage({type: "exportFigma", data: {
-                document: BaseDocument.current
-            }});
+    switch (exportAs) {
+        case 'exportFigma':
+            figma.ui.postMessage({
+                type: 'exportFigma',
+                data: {
+                    document: BaseDocument.current,
+                },
+            });
             break;
-        case "exportAll":
-            figma.ui.postMessage({type: "exportAll", data: {
-                resources: exportableResources,
-                document: BaseDocument.current
-            }});
+        case 'exportAll':
+            figma.ui.postMessage({
+                type: 'exportAll',
+                data: {
+                    resources: exportableResources,
+                    document: BaseDocument.current,
+                },
+            });
             break;
-        case "export":
-            figma.ui.postMessage({type: "export", data: {
-                resources: exportableResources,
-                document: BaseDocument.current
-            }});
+        case 'export':
+            figma.ui.postMessage({
+                type: 'export',
+                data: {
+                    resources: exportableResources,
+                    document: BaseDocument.current,
+                },
+            });
             break;
     }
 }

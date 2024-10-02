@@ -6,7 +6,6 @@
     margin: 0px !important;
 }
 
-
 #inputResizeWidth {
     width: 5rem;
     background-color: #eeeeee;
@@ -17,17 +16,17 @@
     background-color: #eeeeee;
 }
 
-#goButton > img{
+#goButton > img {
     width: 16px;
     height: 16px;
 }
 
-#editButton > img{
+#editButton > img {
     width: 16px;
     height: 16px;
 }
 
-#resizeButton > img{
+#resizeButton > img {
     width: 16px;
     height: 16px;
 }

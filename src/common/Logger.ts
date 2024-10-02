@@ -1,5 +1,5 @@
 export class Logger {
-    private static _source:'PLUGIN'|'UI' = 'PLUGIN';
+    private static _source: 'PLUGIN' | 'UI' = 'PLUGIN';
     public static setSource(source: 'PLUGIN' | 'UI'): void {
         this._source = source;
     }
