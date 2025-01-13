@@ -400,7 +400,7 @@ export async function exportData(
             const byteArray = new Uint8Array(byteNumbers);
             const blob = new Blob([byteArray], {type: 'image/png'});
             zip.file(`${atlas.name}.png`, blob, {base64: true});
-            zip.file(`${atlas.name}.json`, JSON.stringify(atlas.json));
+            zip.file(`${atlas.name}.json`, JSON.stringify(atlas.json, null, '\t'));
         }
 
         figmaDocument.components._components.forEach((component) => {
