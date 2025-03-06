@@ -116,7 +116,7 @@ export class DocumentSpriteSheets {
 
         //console.log("atlasImages:", atlasImages);
 
-        const atlas = new SpriteSheet(size, atlasImages, 1, 1, key, expand);
+        const atlas = new SpriteSheet(size, atlasImages, 1, 2, key, expand);
         await atlas.addImages();
         const result = await atlas.getOutput();
 
