@@ -240,7 +240,7 @@ class Atlas {
         let right: AtlasNode;
 
         if (this._rootNode.rect.w < this._rootNode.rect.h) {
-            this.canvas.width = this._rootNode.rect.w + rect.w + this.margin;
+            this.canvas.width = this._rootNode.rect.w + rect.w + this.margin*2;
             right = new AtlasNode(
                 this._rootNode.rect.w + this.margin,
                 0,
@@ -248,7 +248,7 @@ class Atlas {
                 this._rootNode.rect.h,
             );
         } else {
-            this.canvas.height = this._rootNode.rect.h + rect.h + this.margin;
+            this.canvas.height = this._rootNode.rect.h + rect.h + this.margin*2;
             right = new AtlasNode(
                 0,
                 this._rootNode.rect.h + this.margin,
@@ -289,6 +289,11 @@ class Atlas {
     private _ontoCanvas(id: string, img: Drawable, rect: Rect) {
         this.context.clearRect(rect.x, rect.y, rect.w, rect.h);
         this.context.drawImage(img, rect.x, rect.y, rect.w, rect.h);
+        // this.context.beginPath();
+        // this.context.rect(rect.x, rect.y, rect.w, rect.h);
+        // this.context.lineWidth = 1;
+        // this.context.strokeStyle = 'black';
+        // this.context.stroke();
     }
 }
 
